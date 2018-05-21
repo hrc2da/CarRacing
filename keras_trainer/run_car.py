@@ -184,14 +184,48 @@ def play_one(env, model, eps, gamma, config):
     return totalreward, iters
 
 def parse_config(config):
-    if config == {}:
+    l1 = 0
+    l2 = 0
+    spoiler_d = 35
+    bumper_d = 25
+    densities =[0,0,0,0]
+    if(config == {}):
         return config
     else:
-        return config
+        if("hull_poly1" in config.keys()):
+            hull1_vars = config["hull_poly1"]
+            l1 = hull1_vars['l']
+            config["hull_poly1"] = [(-hull1_vars['w2']/2, 0),(hull1_vars['w2']/2, 0),(-hull1_vars['w1']/2, l1),(hull1_vars['w1']/2, l1)]
+            densities[0] = hull1_vars['d']
+
+        if("hull_poly2" in config.keys()):
+            hull2_vars = config["hull_poly2"]
+            l2 = hull2_vars['l']
+            config["hull_poly2"] = [(-hull2_vars['w1']/2, 0),(hull2_vars['w1']/2, 0),(-hull2_vars['w2']/2, -l2),(hull2_vars['w2']/2, -l2)]
+            densities[1] = hull2_vars['d']
+
+        if("spoiler" in config.keys()):
+            spoiler_w = config["spoiler"]['w']
+            config["hull_poly3"] = [(-l2, -spoiler_w),(-l2, spoiler_w),(-l2-spoiler_d, -spoiler_w),(-l2-spoiler_d, spoiler_w)]
+            densities[2] = config["spoiler"]['d']
+            del config["spoiler"]
+
+        if("bumper" in config.keys()):
+            bumper_w = config["bumper"]['w']
+            config["hull_poly4"] = [(-l1, -bumper_w),(-l1, bumper_w),(-l1-bumper_d, -bumper_w),(-l1-bumper_d, bumper_w)]
+            densities[3] = bumper_w = config["bumper"]['d']
+            del config["bumper"]
+
+        config["hull_densities"] = densities
+
+    return config
 
 def run(config = {}):
+    display = Display(visible=0, size=(1400,900))
+    display.start()
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=True, video_callable=None, mode='training')
+
     vector_size = 10*10 + 7 + 4
 
     model = Model(env)
