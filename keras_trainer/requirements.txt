@@ -3,3 +3,4 @@ numpy==1.14.2
 opencv_python==3.2.0.6
 matplotlib==2.2.2
 scikit_learn==0.19.1
+https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp34-cp34m-linux_x86_64.whl
