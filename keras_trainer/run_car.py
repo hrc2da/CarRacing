@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from gym import wrappers
 from datetime import datetime
 import random
+
 from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
@@ -17,8 +18,6 @@ from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 import cv2
-
-
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -68,7 +67,7 @@ def create_nn():
         return load_model('race-car.h5')
 
     model = Sequential()
-    model.add(Dense(512, init='lecun_uniform', input_shape=(vector_size,)))# 7x7 + 3.  or 14x14 + 3
+    model.add(Dense(512, init='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
     model.add(Activation('relu'))
 
 #     model.add(Dense(512, init='lecun_uniform'))
@@ -95,10 +94,10 @@ class Model:
 		self.model = create_nn()  # one feedforward nn for all actions.
 
 	def predict(self, s):
-		return self.model.predict(s.reshape(-1, vector_size), verbose=0)[0]
+		return self.model.predict(s.reshape(-1, 111), verbose=0)[0]
 
 	def update(self, s, G):
-		self.model.fit(s.reshape(-1, vector_size), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
+		self.model.fit(s.reshape(-1, 111), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
 
 	def sample_action(self, s, eps):
 		qval = self.predict(s)
