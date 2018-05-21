@@ -19,6 +19,7 @@ from keras.models import load_model
 import cv2
 
 
+
 def transform(s):
     bottom_black_bar = s[84:, 12:]
     img = cv2.cvtColor(bottom_black_bar, cv2.COLOR_RGB2GRAY)
@@ -157,37 +158,38 @@ def play_one(env, model, eps, gamma):
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
         argmax_qval, qval = model.sample_action(state, eps)
-        prev_state = state
+        # prev_state = state
         action = convert_argmax_qval_to_env_action(argmax_qval)
-        env.render()
+        # env.render()
         observation, reward, done, info = env.step(action)
 
-        a, b, c = transform(observation)        
-        state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+        # a, b, c = transform(observation)        
+        # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
         
         # update the model
         # standard Q learning TD(0)
-        next_qval = model.predict(state)
-        G = reward + gamma*np.max(next_qval)
-        y = qval[:]
-        y[argmax_qval] = G
+        # next_qval = model.predict(state)
+        # G = reward + gamma*np.max(next_qval)
+        # y = qval[:]
+        # y[argmax_qval] = G
         # model.update(prev_state, y)
         totalreward += reward
         iters += 1
         
-        if iters > 1500:
+        if iters > 300:
             print("This episode is stuck")
             break
         
     return totalreward, iters
 
 env = gym.make('CarRacing-v0')
-# env = wrappers.Monitor(env, 'monitor-folder', force=True, mode='training')
+env = wrappers.Monitor(env, 'monitor-folder', force=True, video_callable=None, mode='training')
 vector_size = 10*10 + 7 + 4
 
 model = Model(env)
 eps = 0.5/np.sqrt(1 + 900) 
 gamma = 0.99
+
 totalreward, iters = play_one(env, model, eps, gamma)
 print("reward:", totalreward)
 
