@@ -25,14 +25,14 @@ def transform(s):
     img = cv2.cvtColor(bottom_black_bar, cv2.COLOR_RGB2GRAY)
     bottom_black_bar_bw = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY)[1]
     bottom_black_bar_bw = cv2.resize(bottom_black_bar_bw, (84, 12), interpolation = cv2.INTER_NEAREST)
-    
+
     # upper_field = observation[:84, :96] # this is the section of the screen that contains the track.
     upper_field = s[:84, 6:90] # we crop side of screen as they carry little information
     img = cv2.cvtColor(upper_field, cv2.COLOR_RGB2GRAY)
     upper_field_bw = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)[1]
     upper_field_bw = cv2.resize(upper_field_bw, (10, 10), interpolation = cv2.INTER_NEAREST) # re scaled to 10x10 pixels
     upper_field_bw = upper_field_bw.astype('float')/255
-        
+
     car_field = s[66:78, 43:53]
     img = cv2.cvtColor(car_field, cv2.COLOR_RGB2GRAY)
     car_field_bw = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY)[1]
@@ -48,25 +48,25 @@ def compute_steering_speed_gyro_abs(a):
     right_steering = a[6, 36:46].mean()/255
     left_steering = a[6, 26:36].mean()/255
     steering = (right_steering - left_steering + 1.0)/2
-    
+
     left_gyro = a[6, 46:60].mean()/255
     right_gyro = a[6, 60:76].mean()/255
     gyro = (right_gyro - left_gyro + 1.0)/2
-    
+
     speed = a[:, 0][:-2].mean()/255
     abs1 = a[:, 6][:-2].mean()/255
     abs2 = a[:, 8][:-2].mean()/255
     abs3 = a[:, 10][:-2].mean()/255
     abs4 = a[:, 12][:-2].mean()/255
 
-    
+
     return [steering, speed, gyro, abs1, abs2, abs3, abs4]
 
 
 def create_nn():
     if os.path.exists('race-car.h5'):
         return load_model('race-car.h5')
-        
+
     model = Sequential()
     model.add(Dense(512, init='lecun_uniform', input_shape=(vector_size,)))# 7x7 + 3.  or 14x14 + 3
     model.add(Activation('relu'))
@@ -85,7 +85,7 @@ def create_nn():
     adamax = Adamax() #Adamax(lr=0.001)
     model.compile(loss='mse', optimizer=adamax)
     model.summary()
-    
+
     return model
 
 
@@ -113,59 +113,60 @@ def convert_argmax_qval_to_env_action(output_value):
     # to reduce the action space, gaz and brake cannot be applied at the same time.
     # as well, steering input and gaz/brake cannot be applied at the same time.
     # similarly to real life drive, you brake/accelerate in straight line, you coast while sterring.
-    
+
     gaz = 0.0
     brake = 0.0
     steering = 0.0
-    
+
     # output value ranges from 0 to 10
-    
+
     if output_value <= 8:
         # steering. brake and gaz are zero.
         output_value -= 4
         steering = float(output_value)/4
     elif output_value >= 9 and output_value <= 9:
         output_value -= 8
-        gaz = float(output_value)/3 # 33% 
+        gaz = float(output_value)/3 # 33%
     elif output_value >= 10 and output_value <= 10:
         output_value -= 9
         brake = float(output_value)/2 # 50% brakes
     else:
         print("error")
-        
+
     white = np.ones((round(brake * 100), 10))
     black = np.zeros((round(100 - brake * 100), 10))
-    brake_display = np.concatenate((black, white))*255  
-    
+    brake_display = np.concatenate((black, white))*255
+
     white = np.ones((round(gaz * 100), 10))
     black = np.zeros((round(100 - gaz * 100), 10))
     gaz_display = np.concatenate((black, white))*255
-        
+
     control_display = np.concatenate((brake_display, gaz_display), axis=1)
 
     # cv2.imshow('controls', control_display)
     # cv2.waitKey(1)
-    
+
     return [steering, gaz, brake]
 
-def play_one(env, model, eps, gamma):
+def play_one(env, model, eps, gamma, config):
     observation = env.reset()
+    env.build_car(config)
     done = False
     full_reward_received = False
     totalreward = 0
     iters = 0
     while not done:
         a, b, c = transform(observation)
-        state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+        state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
         argmax_qval, qval = model.sample_action(state, eps)
         # prev_state = state
         action = convert_argmax_qval_to_env_action(argmax_qval)
         # env.render()
         observation, reward, done, info = env.step(action)
 
-        # a, b, c = transform(observation)        
-        # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        
+        # a, b, c = transform(observation)
+        # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
+
         # update the model
         # standard Q learning TD(0)
         # next_qval = model.predict(state)
@@ -175,21 +176,29 @@ def play_one(env, model, eps, gamma):
         # model.update(prev_state, y)
         totalreward += reward
         iters += 1
-        
+
         if iters > 300:
             print("This episode is stuck")
             break
-        
+
     return totalreward, iters
 
-env = gym.make('CarRacing-v0')
-env = wrappers.Monitor(env, 'monitor-folder', force=True, video_callable=None, mode='training')
-vector_size = 10*10 + 7 + 4
+def parse_config(config):
+    if config == {}:
+        return config
+    else:
+        return config
 
-model = Model(env)
-eps = 0.5/np.sqrt(1 + 900) 
-gamma = 0.99
+def run(config = {}):
+    env = gym.make('CarRacing-v1')
+    env = wrappers.Monitor(env, 'monitor-folder', force=True, video_callable=None, mode='training')
+    vector_size = 10*10 + 7 + 4
 
-totalreward, iters = play_one(env, model, eps, gamma)
-print("reward:", totalreward)
+    model = Model(env)
+    eps = 0.5/np.sqrt(1 + 900)
+    gamma = 0.99
 
+    parsed_config = parse_config(config)
+
+    totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
+    print("reward:", totalreward)
