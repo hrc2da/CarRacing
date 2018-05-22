@@ -225,7 +225,7 @@ def run(config = {}):
     display = Display(visible=0, size=(1400,900))
     display.start()
     env = gym.make('CarRacing-v1')
-    env = wrappers.Monitor(env, 'monitor-folder', force=True, resume = True, video_callable=None, mode='evaluation')
+    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
 
     vector_size = 10*10 + 7 + 4
 
