@@ -205,13 +205,13 @@ def parse_config(config):
 
         if("spoiler" in config.keys()):
             spoiler_w = config["spoiler"]['w']
-            config["hull_poly3"] = [(-l2, -spoiler_w),(-l2, spoiler_w),(-l2-spoiler_d, -spoiler_w),(-l2-spoiler_d, spoiler_w)]
+            config["hull_poly3"] = [(-spoiler_w, -l2),(spoiler_w, -l2),(-spoiler_w, -l2-spoiler_d),(spoiler_w, -l2-spoiler_d)]
             densities[2] = config["spoiler"]['d']
             del config["spoiler"]
 
         if("bumper" in config.keys()):
             bumper_w = config["bumper"]['w']
-            config["hull_poly4"] = [(-l1, -bumper_w),(-l1, bumper_w),(-l1-bumper_d, -bumper_w),(-l1-bumper_d, bumper_w)]
+            config["hull_poly4"] = [(-bumper_w, -l1),(bumper_w, -l1),( -bumper_w, -l1-bumper_d),(bumper_w, -l1-bumper_d)]
             densities[3] = bumper_w = config["bumper"]['d']
             del config["bumper"]
 
