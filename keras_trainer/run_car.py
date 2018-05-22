@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from gym import wrappers
 from datetime import datetime
 import random
-
+from pyvirtualdisplay import Display
 from sklearn.preprocessing import StandardScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
@@ -148,8 +148,8 @@ def convert_argmax_qval_to_env_action(output_value):
     return [steering, gaz, brake]
 
 def play_one(env, model, eps, gamma, config):
-    observation = env.reset()
-    env.build_car(config)
+    observation = env.reset(config)
+    #env.build_car(config)
     done = False
     full_reward_received = False
     totalreward = 0
@@ -235,3 +235,4 @@ def run(config = {}):
 
     totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
     print("reward:", totalreward)
+    return [totalreward, 0, 0]
