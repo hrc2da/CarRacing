@@ -213,7 +213,7 @@ def parse_config(config):
 
         if("bumper" in config.keys()):
             bumper_w = config["bumper"]['w']
-            config["hull_poly4"] = [(-bumper_w, -l1),(bumper_w, -l1),( -bumper_w, -l1-bumper_d),(bumper_w, -l1-bumper_d)]
+            config["hull_poly4"] = [(-bumper_w, l1),(bumper_w, l1),( -bumper_w, l1+bumper_d),(bumper_w, l1+bumper_d)]
             densities[3] = bumper_w = config["bumper"]['d']
             del config["bumper"]
 
