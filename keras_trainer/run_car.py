@@ -19,7 +19,7 @@ from keras.utils import np_utils
 from keras.models import load_model
 import cv2
 import os
-os.environ[‘TF_CPP_MIN_LOG_LEVEL’]=‘2’
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
