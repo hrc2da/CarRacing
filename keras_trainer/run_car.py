@@ -18,6 +18,8 @@ from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 import cv2
+import os
+os.environ[‘TF_CPP_MIN_LOG_LEVEL’]=‘2’
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -223,7 +225,7 @@ def run(config = {}):
     display = Display(visible=0, size=(1400,900))
     display.start()
     env = gym.make('CarRacing-v1')
-    env = wrappers.Monitor(env, 'monitor-folder', force=True, video_callable=None, mode='training')
+    env = wrappers.Monitor(env, 'monitor-folder', force=True, resume = True, video_callable=None, mode='evaluation')
 
     vector_size = 10*10 + 7 + 4
 
