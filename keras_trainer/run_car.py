@@ -3,11 +3,14 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from gym import wrappers
+import gym.spaces
+import gym.wrappers as wrappers
+#from gym import wrappers
 from datetime import datetime
 import random
 from pyvirtualdisplay import Display
 from sklearn.preprocessing import StandardScaler
+import cv2
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
@@ -17,7 +20,6 @@ from keras.layers import Convolution2D, MaxPooling2D
 from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
-import cv2
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
@@ -69,14 +71,14 @@ def create_nn():
         return load_model('race-car.h5')
 
     model = Sequential()
-    model.add(Dense(512, init='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
+    model.add(Dense(512, kernel_initializer='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
     model.add(Activation('relu'))
 
 #     model.add(Dense(512, init='lecun_uniform'))
 #     model.add(Activation('relu'))
 #     model.add(Dropout(0.3))
 
-    model.add(Dense(11, init='lecun_uniform'))
+    model.add(Dense(11, kernel_initializer='lecun_uniform'))
     model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
 #     rms = RMSprop(lr=0.005)
@@ -85,7 +87,7 @@ def create_nn():
 #     adam = Adam(lr=0.0005)
     adamax = Adamax() #Adamax(lr=0.001)
     model.compile(loss='mse', optimizer=adamax)
-    model.summary()
+    #model.summary()
 
     return model
 
