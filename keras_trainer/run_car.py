@@ -21,6 +21,7 @@ from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 import os
+from socketIO_client import SocketIO
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 def transform(s):
@@ -157,6 +158,8 @@ def play_one(env, model, eps, gamma, config):
     done = False
     full_reward_received = False
     totalreward = 0
+    totalfuelconsumed = 0
+    totalgrasstraveled = 0
     iters = 0
     while not done:
         a, b, c = transform(observation)
@@ -178,13 +181,15 @@ def play_one(env, model, eps, gamma, config):
         # y[argmax_qval] = G
         # model.update(prev_state, y)
         totalreward += reward
+        totalfuelconsumed += info["fuel"]
+        totalgrasstraveled += info["grass"]
         iters += 1
 
         if iters > 300:
             print("This episode is stuck")
             break
 
-    return totalreward, iters
+    return totalreward, iters, totalfuelconsumed, totalgrasstraveled #Matt:weird order is to not break anything else
 
 def parse_config(config):
     l1 = 0
@@ -223,7 +228,32 @@ def parse_config(config):
 
     return config
 
-def run(config = {}):
+def init_buffer():
+    display = Display(visible=0,size=(1400,900))
+    display.start()
+    return display
+
+def kill_buffer(display):
+    display.sendstop()
+def run(config = {},session_id=None):
+    env = gym.make('CarRacing-v1')
+    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume=True, video_callable= False, mode='evaluation')
+    vector_size = 10*10 + 7 + 4
+    model = Model(env)
+    eps = 0.5/np.sqrt(1 + 900)
+    gamma = 0.99
+
+    parsed_config = parse_config(config)
+
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    env.close()
+    with open("/share/sandbox/carracing/logged_cars.txt", "a+") as carfile:
+        carfile.write(str(config)+","+str(totalreward)+","+ str(fuel)+","+str(grass)+"\n")
+    with SocketIO('127.0.0.1','5000') as SIO:
+        SIO.emit('evaluated_car',{"session_id":session_id,"car":{'config':config,'reward':totalreward,'fuel':fuel, 'grass':grass}})
+    print("REWARD: ", totalreward, " FUEL: ", fuel, "GRASS: ",grass)
+    return [totalreward, fuel, grass]
+def run_vid(config = {}):
     display = Display(visible=0, size=(1400,900))
     display.start()
     env = gym.make('CarRacing-v1')
@@ -237,6 +267,7 @@ def run(config = {}):
 
     parsed_config = parse_config(config)
 
-    totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    display.sendstop()
     print("reward:", totalreward)
-    return [totalreward, 0, 0]
+    return [totalreward, fuel, grass]
