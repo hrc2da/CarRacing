@@ -78,10 +78,10 @@ class Car:
             position = (init_x, init_y),
             angle = init_angle,
             fixtures = [
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly1 ]), density=1),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly2 ]), density=1),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly3 ]), density=1),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly4 ]), density=1)
+                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly1 ]), density=self.hull_densities[0]),
+                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly2 ]), density=self.hull_densities[1]),
+                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly3 ]), density=self.hull_densities[2]),
+                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly4 ]), density=self.hull_densities[3])
                 ]
             )
         self.hull.color = (0.8,0.0,0.0)
