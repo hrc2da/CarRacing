@@ -1,6 +1,7 @@
 import gym
 import os
 import sys
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 from gym import wrappers
@@ -19,7 +20,7 @@ from keras.utils import np_utils
 from keras.models import load_model
 import cv2
 import os
-os.environ[‘TF_CPP_MIN_LOG_LEVEL’]=‘2’
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -234,7 +235,34 @@ def run(config = {}):
     gamma = 0.99
 
     parsed_config = parse_config(config)
-
+    # parsed_config = config
     totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
     print("reward:", totalreward)
     return [totalreward, 0, 0]
+
+def run_unparsed(config = {}):
+    display = Display(visible=0, size=(1400,900))
+    display.start()
+    env = gym.make('CarRacing-v1')
+    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
+
+    vector_size = 10*10 + 7 + 4
+
+    model = Model(env)
+    eps = 0.5/np.sqrt(1 + 900)
+    gamma = 0.99
+
+    # parsed_config = parse_config(config)
+    parsed_config = config
+    totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
+    print("reward:", totalreward)
+    return [totalreward, 0, 0]
+
+def run_configs_from_file(filepath):
+    with open(filepath,"r") as infile:
+        configs = []
+        for line in infile:
+            configs.append(json.loads(line))
+    for car in configs:
+        print(car['reward'])
+        run_unparsed(car['config'])
