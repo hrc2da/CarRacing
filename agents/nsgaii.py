@@ -144,7 +144,7 @@ class NormReal(Real):
     """
     
     def __init__(self, min_value, max_value):
-        super(NormReal, self).__init__()
+        super(NormReal, self).__init__(min_value, max_value)
         self.min_value = float(min_value)
         self.max_value = float(max_value)
         
