@@ -1,4 +1,5 @@
 import sys, traceback
+import random
 sys.path.append('/share/sandbox/')
 #from schwimmbad import MultiPool
 from platypus import NSGAII, Problem, Type, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job, Generator
