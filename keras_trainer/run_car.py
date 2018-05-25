@@ -22,10 +22,7 @@ from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 import os
-<<<<<<< HEAD
-=======
 from socketIO_client import SocketIO
->>>>>>> 4ff4f4f2933202f0fe74f4a9365aecdd97a4fb6a
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 def transform(s):
