@@ -133,7 +133,7 @@ class nsgaii_agent:
             kill_buffer(display)
 
 
-class NormReal(Type):
+class NormReal(Real):
     """Represents a floating-point value with min and max bounds.
     Attributes
     ----------
