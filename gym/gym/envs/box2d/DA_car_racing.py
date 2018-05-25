@@ -313,12 +313,17 @@ class DACarRacing(gym.Env):
         self.state = self.render("state_pixels")
 
         step_reward = 0
+        step_fuel = 0
+        step_grass = 0
         done = False
         if action is not None: # First step without action, called from reset()
             self.reward -= 0.1
             # We actually don't want to count fuel spent, we want car to be faster.
             #self.reward -=  10 * self.car.fuel_spent / ENGINE_POWER
-            self.car.fuel_spent = 0.0
+            step_fuel = self.car.fuel_spent
+            step_grass = self.car.grass_traveled
+            self.car.fuel_spent = 0.0 #Matt: let's reset fuel and grass on each step, tracking it at the run_car level
+            self.car.grass_traveled = 0.0
             step_reward = self.reward - self.prev_reward
             self.prev_reward = self.reward
             # if self.tile_visited_count==len(self.track):
@@ -328,7 +333,7 @@ class DACarRacing(gym.Env):
                 done = True
                 step_reward = -100
 
-        return self.state, step_reward, done, {}
+        return self.state, step_reward, done,{"fuel":step_fuel,"grass":step_grass}
 
     def render(self, mode='human'):
         if self.viewer is None:

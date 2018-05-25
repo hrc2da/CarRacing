@@ -87,6 +87,7 @@ class Car:
         self.hull.color = (0.8,0.0,0.0)
         self.wheels = []
         self.fuel_spent = 0.0
+        self.grass_traveled = 0.0
         self.wheel_poly= [
             (-self.wheel_width,+self.wheel_rad), (+self.wheel_width,+self.wheel_rad),
             (+self.wheel_width,-self.wheel_rad), (-self.wheel_width,-self.wheel_rad)
@@ -168,7 +169,8 @@ class Car:
             for tile in w.tiles:
                 friction_limit = max(friction_limit, self.friction_lim*tile.road_friction)
                 grass = False
-
+            if grass == True:
+                self.grass_traveled += 1
             # Force
             forw = w.GetWorldVector( (0,1) )
             side = w.GetWorldVector( (1,0) )

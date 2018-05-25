@@ -4,11 +4,14 @@ import sys
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from gym import wrappers
+import gym.spaces
+import gym.wrappers as wrappers
+#from gym import wrappers
 from datetime import datetime
 import random
 from pyvirtualdisplay import Display
 from sklearn.preprocessing import StandardScaler
+import cv2
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
@@ -18,8 +21,11 @@ from keras.layers import Convolution2D, MaxPooling2D
 from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
-import cv2
 import os
+<<<<<<< HEAD
+=======
+from socketIO_client import SocketIO
+>>>>>>> 4ff4f4f2933202f0fe74f4a9365aecdd97a4fb6a
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 def transform(s):
@@ -70,14 +76,14 @@ def create_nn():
         return load_model('race-car.h5')
 
     model = Sequential()
-    model.add(Dense(512, init='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
+    model.add(Dense(512, kernel_initializer='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
     model.add(Activation('relu'))
 
 #     model.add(Dense(512, init='lecun_uniform'))
 #     model.add(Activation('relu'))
 #     model.add(Dropout(0.3))
 
-    model.add(Dense(11, init='lecun_uniform'))
+    model.add(Dense(11, kernel_initializer='lecun_uniform'))
     model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
 #     rms = RMSprop(lr=0.005)
@@ -86,7 +92,7 @@ def create_nn():
 #     adam = Adam(lr=0.0005)
     adamax = Adamax() #Adamax(lr=0.001)
     model.compile(loss='mse', optimizer=adamax)
-    model.summary()
+    #model.summary()
 
     return model
 
@@ -156,6 +162,8 @@ def play_one(env, model, eps, gamma, config):
     done = False
     full_reward_received = False
     totalreward = 0
+    totalfuelconsumed = 0
+    totalgrasstraveled = 0
     iters = 0
     while not done:
         a, b, c = transform(observation)
@@ -177,13 +185,15 @@ def play_one(env, model, eps, gamma, config):
         # y[argmax_qval] = G
         # model.update(prev_state, y)
         totalreward += reward
+        totalfuelconsumed += info["fuel"]
+        totalgrasstraveled += info["grass"]
         iters += 1
 
         if iters > 300:
             print("This episode is stuck")
             break
 
-    return totalreward, iters
+    return totalreward, iters, totalfuelconsumed, totalgrasstraveled #Matt:weird order is to not break anything else
 
 def parse_config(config):
     l1 = 0
@@ -222,7 +232,32 @@ def parse_config(config):
 
     return config
 
-def run(config = {}):
+def init_buffer():
+    display = Display(visible=0,size=(1400,900))
+    display.start()
+    return display
+
+def kill_buffer(display):
+    display.sendstop()
+def run(config = {},session_id=None):
+    env = gym.make('CarRacing-v1')
+    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume=True, video_callable= False, mode='evaluation')
+    vector_size = 10*10 + 7 + 4
+    model = Model(env)
+    eps = 0.5/np.sqrt(1 + 900)
+    gamma = 0.99
+
+    parsed_config = parse_config(config)
+
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    env.close()
+    with open("/share/sandbox/carracing/logged_cars.txt", "a+") as carfile:
+        carfile.write(str(config)+","+str(totalreward)+","+ str(fuel)+","+str(grass)+"\n")
+    with SocketIO('127.0.0.1','5000') as SIO:
+        SIO.emit('evaluated_car',{"session_id":session_id,"car":{'config':config,'reward':totalreward,'fuel':fuel, 'grass':grass}})
+    print("REWARD: ", totalreward, " FUEL: ", fuel, "GRASS: ",grass)
+    return [totalreward, fuel, grass]
+def run_vid(config = {}):
     display = Display(visible=0, size=(1400,900))
     display.start()
     env = gym.make('CarRacing-v1')
@@ -236,9 +271,9 @@ def run(config = {}):
 
     parsed_config = parse_config(config)
     # parsed_config = config
-    totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
-    print("reward:", totalreward)
-    return [totalreward, 0, 0]
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    display.sendstop()
+    return [totalreward, fuel, grass]
 
 def run_unparsed(config = {}):
     display = Display(visible=0, size=(1400,900))
@@ -246,17 +281,15 @@ def run_unparsed(config = {}):
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
 
-    vector_size = 10*10 + 7 + 4
-
     model = Model(env)
     eps = 0.5/np.sqrt(1 + 900)
     gamma = 0.99
 
     # parsed_config = parse_config(config)
     parsed_config = config
-    totalreward, iters = play_one(env, model, eps, gamma, parsed_config)
-    print("reward:", totalreward)
-    return [totalreward, 0, 0]
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    display.sendstop()
+    return [totalreward, fuel, grass]
 
 def run_configs_from_file(filepath):
     with open(filepath,"r") as infile:
@@ -266,3 +299,4 @@ def run_configs_from_file(filepath):
     for car in configs:
         print(car['reward'])
         run_unparsed(car['config'])
+
