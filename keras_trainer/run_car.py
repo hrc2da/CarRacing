@@ -1,6 +1,7 @@
 import gym
 import os
 import sys
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import gym.spaces
@@ -266,8 +267,33 @@ def run_vid(config = {}):
     gamma = 0.99
 
     parsed_config = parse_config(config)
-
+    # parsed_config = config
     totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
     display.sendstop()
-    print("reward:", totalreward)
     return [totalreward, fuel, grass]
+
+def run_unparsed(config = {}):
+    display = Display(visible=0, size=(1400,900))
+    display.start()
+    env = gym.make('CarRacing-v1')
+    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
+
+    model = Model(env)
+    eps = 0.5/np.sqrt(1 + 900)
+    gamma = 0.99
+
+    # parsed_config = parse_config(config)
+    parsed_config = config
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
+    display.sendstop()
+    return [totalreward, fuel, grass]
+
+def run_configs_from_file(filepath):
+    with open(filepath,"r") as infile:
+        configs = []
+        for line in infile:
+            configs.append(json.loads(line))
+    for car in configs:
+        print(car['reward'])
+        run_unparsed(car['config'])
+
