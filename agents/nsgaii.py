@@ -1,7 +1,7 @@
 import sys, traceback
 sys.path.append('/share/sandbox/')
 #from schwimmbad import MultiPool
-from platypus import NSGAII, Problem, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job
+from platypus import NSGAII, Problem, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job, Generator
 from platypus.config import default_variator
 from collections import namedtuple
 from carracing.keras_trainer.run_car import run, init_buffer, kill_buffer
@@ -56,8 +56,8 @@ class nsgaii_agent:
                 self.session_id=session_id
                 self.problem = Problem(24,3,6)
                 self.problem.types = [Integer(1e6,1e9), #eng_power
-                                        Real(4e2,4e4), #wheel_moment
-                                        Real(1e3,1e6), #friction_lim
+                                        NormReal(4e2,4e4), #wheel_moment
+                                        NormReal(1e3,1e6), #friction_lim
                                         Integer(15,100), #wheel_rad
                                         Integer(15,100), #wheel_width
                                         Integer(-250,-10), #wheel1_x
@@ -70,17 +70,17 @@ class nsgaii_agent:
                                         #Integer(-500,-10), #wheel4_y
                                         Binary(4), #drive_train]
                                         Integer(5,300), #bumper_width
-                                        Real(0.1,2), #spoiler_density
+                                        NormReal(0.1,2), #spoiler_density
                                         Integer(10,250), #hull1_width1
                                         Integer(10,250), #hull1_width2
                                         Integer(10,250), #hull1_length
-                                        Real(0.1,2), #hull1_density
+                                        NormReal(0.1,2), #hull1_density
                                         Integer(10,250), #hull2_width1
                                         Integer(10,250), #hull2_width2
                                         Integer(10,250), #hull2_length
-                                        Real(0.1,2), #hull_density
+                                        NormReal(0.1,2), #hull_density
                                         Integer(5,300), #spoiler_width
-                                        Real(0.1,2)] #spoiler_density
+                                        NormReal(0.1,2)] #spoiler_density
                 self.problem.constraints[:] = "<=0"
                 self.problem.function = self.evaluate
                 self.problem.directions = [self.problem.MAXIMIZE,self.problem.MINIMIZE,self.problem.MINIMIZE]
@@ -131,6 +131,28 @@ class nsgaii_agent:
                 print("initialized algorithm")
                 algorithm.run(self.n_iters)
             kill_buffer(display)
+
+
+class NormReal(Type):
+    """Represents a floating-point value with min and max bounds.
+    Attributes
+    ----------
+    min_value : int
+        The minimum value (inclusive)
+    max_value: int
+        The maximum value (inclusive)
+    """
+    
+    def __init__(self, min_value, max_value):
+        super(Real, self).__init__()
+        self.min_value = float(min_value)
+        self.max_value = float(max_value)
+        
+    def rand(self):
+        return random.normalvariate(self.min_value+self.max_value/2, self.min_value+self.max_value/8)
+        
+    def __str__(self):
+        return "Real(%f, %f)" % (self.min_value, self.max_value)
 
 
 class errorBlindMultiprocessingEvaluator(MultiprocessingEvaluator):
