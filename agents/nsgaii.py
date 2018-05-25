@@ -61,25 +61,25 @@ class nsgaii_agent:
                                         Integer(15,100), #wheel_rad
                                         Integer(15,100), #wheel_width
                                         Integer(-250,-10), #wheel1_x
-                                        Integer(10,500), #wheel1_y
-                                        Integer(10,250), #wheel2_x
+                                        Integer(10,125), #wheel1_y
+                                        Integer(10,125), #wheel2_x
                                         #Integer(10,500), #wheel2_y
-                                        Integer(-250,-10), #wheel3_x 
-                                        Integer(-500,-10), #wheel3_y
-                                        Integer(10,250), #wheel4_x
+                                        Integer(-125,-10), #wheel3_x 
+                                        Integer(-250,-10), #wheel3_y
+                                        Integer(10,125), #wheel4_x
                                         #Integer(-500,-10), #wheel4_y
                                         Binary(4), #drive_train]
-                                        Integer(5,600), #bumper_width
+                                        Integer(5,300), #bumper_width
                                         Real(0.1,2), #spoiler_density
-                                        Integer(10,500), #hull1_width1
-                                        Integer(10,500), #hull1_width2
-                                        Integer(10,500), #hull1_length
+                                        Integer(10,250), #hull1_width1
+                                        Integer(10,250), #hull1_width2
+                                        Integer(10,250), #hull1_length
                                         Real(0.1,2), #hull1_density
-                                        Integer(10,500), #hull2_width1
-                                        Integer(10,500), #hull2_width2
-                                        Integer(10,500), #hull2_length
+                                        Integer(10,250), #hull2_width1
+                                        Integer(10,250), #hull2_width2
+                                        Integer(10,250), #hull2_length
                                         Real(0.1,2), #hull_density
-                                        Integer(5,600), #spoiler_width
+                                        Integer(5,300), #spoiler_width
                                         Real(0.1,2)] #spoiler_density
                 self.problem.constraints[:] = "<=0"
                 self.problem.function = self.evaluate
