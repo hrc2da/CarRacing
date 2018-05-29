@@ -25,7 +25,9 @@ from keras.utils import np_utils
 from keras.models import load_model
 import os
 from socketIO_client import SocketIO
+
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+orig = os.environ["DISPLAY"]
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -268,6 +270,8 @@ def parse_config(config):
     return config
 
 def init_buffer():
+    global orig
+    os.environ["DISPLAY"] = orig
     display = Display(visible=0,size=(1400,900))
     display.start()
     return display
