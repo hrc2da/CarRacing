@@ -27,7 +27,8 @@ import os
 from socketIO_client import SocketIO
 
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-orig = None
+os.environ["DISPLAY"] = ':1'
+orig = os.environ["DISPLAY"]
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -327,7 +328,7 @@ def run_unparsed(config = {}, filename=None,display=None):
     global orig
     #testing os level display fix
     if display is None:
-        os.environ["DISPLAY"] = ''
+        os.environ["DISPLAY"] = ':1'
         tempdisplay = Display(visible=0, size=(1400,900))
         tempdisplay.start()
         #tempdisplay = Xvfb(width=1400,height=900)
@@ -347,7 +348,7 @@ def run_unparsed(config = {}, filename=None,display=None):
     if tempdisplay is not None:
         tempdisplay.sendstop()
         tempdisplay = None
-        os.environ["DISPLAY"]=''
+        os.environ["DISPLAY"]=':1'
         print("closed display")
     return [totalreward, fuel, grass]
 
