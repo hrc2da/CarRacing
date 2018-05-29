@@ -27,7 +27,7 @@ import os
 from socketIO_client import SocketIO
 
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-orig = os.environ["DISPLAY"]
+orig = None
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -272,10 +272,10 @@ def parse_config(config):
 def init_buffer():
     #testing os level display fix
     global orig
-    os.environ["DISPLAY"] = orig
     #testing os level display fix
     display = Display(visible=0,size=(1400,900))
     display.start()
+    orig = os.environ["DISPLAY"]
     return display
 
 def kill_buffer(display):
