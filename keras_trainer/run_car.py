@@ -6,10 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym.spaces
 import gym.wrappers as wrappers
+from gym.wrappers.monitoring import stats_recorder, video_recorder
 #from gym import wrappers
 from datetime import datetime
 import random
 from pyvirtualdisplay import Display
+#from xvfbwrapper import Xvfb
 from sklearn.preprocessing import StandardScaler
 import cv2
 from keras.models import Sequential
@@ -100,7 +102,8 @@ class Model:
 		self.model = create_nn()  # one feedforward nn for all actions.
 
 	def predict(self, s):
-		return self.model.predict(s.reshape(-1, 111), verbose=0)[0]
+                print("SSSS",s)
+                return self.model.predict(s.reshape(-1, 111), verbose=0)[0]
 
 	def update(self, s, G):
 		self.model.fit(s.reshape(-1, 111), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
@@ -153,9 +156,43 @@ def convert_argmax_qval_to_env_action(output_value):
 
     return [steering, gaz, brake]
 
-def play_one(env, model, eps, gamma, config):
-    observation = env.reset(config)
+
+
+def reset_video_recorder_filename(filename,env):
+    if env.video_recorder:
+        env._close_video_recorder()
+    env.video_recorder = video_recorder.VideoRecorder(
+                env=env,
+                path=os.path.join(env.directory,filename),
+                metadata={'episode_id': env.episode_id},
+                enabled=env._video_enabled(),
+            )
+    env.video_recorder.capture_frame()
+            # Close any existing video recorder
+            #         if self.video_recorder:
+            #                     self._close_video_recorder()
+            #
+            #                             # Start recording the next video.
+            #                                     #
+            #                                             # TODO: calculate a more correct 'episode_id' upon merge
+            #                                                     self.video_recorder = video_recorder.VideoRecorder(
+            #                                                                 env=self.env,
+            #                                                                             base_path=os.path.join(self.directory, '{}.video.{}.video{:06}'.format(self.file_prefix, self.file_infix, self.episode_id)),
+            #                                                                                         metadata={'episode_id': self.episode_id},
+            #                                                                                                     enabled=self._video_enabled(),
+            #                                                                                                             )
+            #                                                                                                                     self.video_recorder.capture_frame()
+
+
+
+def play_one(env,model, eps, gamma, config,path=None,display=None):
+    print("about to reset env")
+    observation = env.reset(config,display)
+    print("Made it past env reset")
+    if(path):
+        reset_video_recorder_filename(path,env)
     #env.build_car(config)
+    print("Made it past video recorder reset")
     done = False
     full_reward_received = False
     totalreward = 0
@@ -189,7 +226,8 @@ def play_one(env, model, eps, gamma, config):
         if iters > 300:
             print("This episode is stuck")
             break
-
+    if(env.video_recorder):
+        env._close_video_recorder()
     return totalreward, iters, totalfuelconsumed, totalgrasstraveled #Matt:weird order is to not break anything else
 
 def parse_config(config):
@@ -272,20 +310,28 @@ def run_vid(config = {}):
     display.sendstop()
     return [totalreward, fuel, grass]
 
-def run_unparsed(config = {}):
-    display = Display(visible=0, size=(1400,900))
-    display.start()
+def run_unparsed(config = {}, filename=None,display=None):
+    tempdisplay = None
+    if display is None:
+        tempdisplay = Display(visible=0, size=(1400,900))
+        #tempdisplay = Xvfb(width=1400,height=900)
+        tempdisplay.start()
     env = gym.make('CarRacing-v1')
-    env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
-
+    env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation')
     model = Model(env)
     eps = 0.5/np.sqrt(1 + 900)
     gamma = 0.99
 
     # parsed_config = parse_config(config)
     parsed_config = config
-    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
-    display.sendstop()
+    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config, filename);
+    env.close()
+    env = None
+    model = None
+    if tempdisplay is not None:
+        tempdisplay.sendstop()
+        tempdisplay = None
+        print("closed display")
     return [totalreward, fuel, grass]
 
 def run_configs_from_file(filepath):
@@ -296,4 +342,9 @@ def run_configs_from_file(filepath):
     for car in configs:
         print(car['reward'])
         run_unparsed(car['config'])
-
+if __name__=='__main__':
+    #disp = Display(visible=0,size=(1400,900))
+    #disp.start()
+    run_unparsed(filename="testrun1.mp4",display=None)
+    run_unparsed(filename="testrun2.mp4",display=None)
+    #disp.sendstop()

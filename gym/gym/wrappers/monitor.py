@@ -37,15 +37,17 @@ class Monitor(Wrapper):
         self.env.build_car(config)
 
 
-    def reset(self, config={},**kwargs):
+    def reset(self, config={},display=None,**kwargs):
         self._before_reset()
+        print(str(self.env))
         observation = self.env.reset(config,**kwargs)
         self._after_reset(observation)
 
         return observation
 
-    def close(self):
-        super(Monitor, self)._close()
+    def reclose(self):
+        super(Monitor, self).close()
+        print('first close')
 
         # _monitor will not be set if super(Monitor, self).__init__ raises, this check prevents a confusing error message
         if getattr(self, '_monitor', None):
@@ -142,13 +144,14 @@ class Monitor(Wrapper):
 
     def close(self):
         """Flush all monitor data to disk and close any open rending windows."""
+        print("second close")
         if not self.enabled:
             return
         self.stats_recorder.close()
         if self.video_recorder is not None:
             self._close_video_recorder()
         self._flush(force=True)
-
+        self.env.close()
         # Stop tracking this for autoclose
         monitor_closer.unregister(self._monitor_id)
         self.enabled = False

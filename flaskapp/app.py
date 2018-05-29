@@ -1,14 +1,21 @@
-from flask import Flask
-from flask import jsonify
+from flask import Flask, request, jsonify
 from flask_socketio import SocketIO,send,emit
-import sys
+from flask_cors import CORS
+import os,sys
 sys.path.append('/share/sandbox/')
 from carracing.agents.nsgaii import nsgaii_agent
+from carracing.keras_trainer.run_car import run_unparsed
 import time
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import json
-app = Flask(__name__)
+from pyvirtualdisplay import Display
+import uuid
+app = Flask(__name__, static_url_path='/static')
+CORS(app) #not secure; set up a whitelist?
 socketio = SocketIO(app)
+
+
 
 max_reward = 0
 
@@ -19,7 +26,26 @@ def hello():
 def about():
     data = {"msg":"This is a simulated workspace where you can design racecars for OpenAI Gym's CarRacing environment."}
     return jsonify(data)
-        
+
+@app.route("/testdrive", methods=['POST'])
+def testdrive():
+    display = Display(visible=0, size=(1400,900))
+    display.start()
+    carConfig = request.get_json()
+    #create a unique filename.mp4
+    filename = uuid.uuid4().hex+'.mp4'
+    #run the car with it
+    #t = threading.Thread(target=run_unparsed, args=(carConfig,os.path.join('../static',filename))) #this is a hack to write outside the monitor-files dir
+    #t.start()
+    #t.join()
+    with ThreadPoolExecutor(max_workers=4) as e:
+        simulation = e.submit(run_unparsed, carConfig, filename, display) #pass true if display is enabled
+    #let's try this for now, but blocking isn't going to work if >1 user.
+    #potential solution: redis+celery (blog.miguelgrinberg.com/post/using-celery-with-flask
+        return jsonify({"video":filename, "result":simulation.result()})
+#    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
+#    return jsonify({"video":filename,"result":result})
+    display.sendstop()
 @socketio.on('connect')
 def handle_connect():
     sess = str(time.time())
@@ -44,4 +70,5 @@ def handle_evaluated_car(evaluation):
 
 
 if __name__ == "__main__":
-        socketio.run(app, host='0.0.0.0')
+        #display = None
+        socketio.run(app,  host='0.0.0.0')

@@ -277,7 +277,7 @@ class DACarRacing(gym.Env):
         self.track = track
         return True
 
-    def reset(self, config={}):
+    def reset(self, config={},display=None):
         self._destroy()
         self.reward = 0.0
         self.prev_reward = 0.0
@@ -295,12 +295,12 @@ class DACarRacing(gym.Env):
         else:
             self.car = Car(self.world, *self.track[0][1:4])
 
-        return self.step(None)[0]
+        return self.step(None,display)[0]
 
     def build_car(self, config = {}) :
        self.car = Car(self.world, *self.track[0][1:4], **config)
 
-    def step(self, action):
+    def step(self, action,display=None):
         if action is not None:
             self.car.steer(-action[0])
             self.car.gas(action[1])
@@ -310,7 +310,7 @@ class DACarRacing(gym.Env):
         self.world.Step(1.0/FPS, 6*30, 2*30)
         self.t += 1.0/FPS
 
-        self.state = self.render("state_pixels")
+        self.state = self.render("state_pixels",display)
 
         step_reward = 0
         step_fuel = 0
@@ -335,15 +335,17 @@ class DACarRacing(gym.Env):
 
         return self.state, step_reward, done,{"fuel":step_fuel,"grass":step_grass}
 
-    def render(self, mode='human'):
+    def render(self, mode='human',display=None):
         if self.viewer is None:
+            print("creating a viewer")
             from gym.envs.classic_control import rendering
-            self.viewer = rendering.Viewer(WINDOW_W, WINDOW_H)
+            print("successfully imported")
+            self.viewer = rendering.Viewer(WINDOW_W, WINDOW_H,display)
+            print("instantiated viewer")
             self.score_label = pyglet.text.Label('0000', font_size=36,
                 x=20, y=WINDOW_H*2.5/40.00, anchor_x='left', anchor_y='center',
                 color=(255,255,255,255))
             self.transform = rendering.Transform()
-
         if "t" not in self.__dict__: return  # reset() not called yet
 
         zoom = 0.1*SCALE*max(1-self.t, 0) + ZOOM*SCALE*min(self.t, 1)   # Animate zoom first second
@@ -409,6 +411,7 @@ class DACarRacing(gym.Env):
         return arr
 
     def close(self):
+        print("dacr close")
         if self.viewer is not None:
             self.viewer.close()
             self.viewer = None
