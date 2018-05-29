@@ -188,7 +188,7 @@ def reset_video_recorder_filename(filename,env):
 def play_one(env,model, eps, gamma, config,path=None,display=None):
     print("about to reset env")
     observation = env.reset(config,display)
-    print("Made it past env reset")
+    print("Made it past env reset with path:",path)
     if(path):
         reset_video_recorder_filename(path,env)
     #env.build_car(config)
