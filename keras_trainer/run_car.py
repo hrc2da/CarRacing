@@ -360,6 +360,8 @@ def run_configs_from_file(filepath):
 if __name__=='__main__':
     #disp = Display(visible=0,size=(1400,900))
     #disp.start()
+    init_buffer()
     run_unparsed(filename="testrun1.mp4",display=None)
     run_unparsed(filename="testrun2.mp4",display=None)
+    kill_buffer()
     #disp.sendstop()
