@@ -275,7 +275,7 @@ def init_buffer():
     #testing os level display fix
     display = Display(visible=0,size=(1400,900))
     display.start()
-    orig = os.environ["DISPLAY"]
+    #orig = os.environ["DISPLAY"]
     return display
 
 def kill_buffer(display):
@@ -325,12 +325,13 @@ def run_unparsed(config = {}, filename=None,display=None):
     tempdisplay = None
 #testing os level display fix
     global orig
-    os.environ["DISPLAY"] = orig
     #testing os level display fix
     if display is None:
+        os.environ["DISPLAY"] = ''
         tempdisplay = Display(visible=0, size=(1400,900))
-        #tempdisplay = Xvfb(width=1400,height=900)
         tempdisplay.start()
+        #tempdisplay = Xvfb(width=1400,height=900)
+        #tempdisplay.start()
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation')
     model = Model(env)
@@ -346,6 +347,7 @@ def run_unparsed(config = {}, filename=None,display=None):
     if tempdisplay is not None:
         tempdisplay.sendstop()
         tempdisplay = None
+        os.environ["DISPLAY"]=''
         print("closed display")
     return [totalreward, fuel, grass]
 
@@ -360,8 +362,8 @@ def run_configs_from_file(filepath):
 if __name__=='__main__':
     #disp = Display(visible=0,size=(1400,900))
     #disp.start()
-    init_buffer()
+    #init_buffer()
     run_unparsed(filename="testrun1.mp4",display=None)
     run_unparsed(filename="testrun2.mp4",display=None)
-    kill_buffer()
+    #kill_buffer()
     #disp.sendstop()
