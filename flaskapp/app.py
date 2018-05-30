@@ -29,8 +29,6 @@ def about():
 
 @app.route("/testdrive", methods=['POST'])
 def testdrive():
-    display = Display(visible=0, size=(1400,900))
-    display.start()
     carConfig = request.get_json()
     #create a unique filename.mp4
     filename = uuid.uuid4().hex+'.mp4'
@@ -45,7 +43,6 @@ def testdrive():
         return jsonify({"video":filename, "result":simulation.result()})
 #    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
 #    return jsonify({"video":filename,"result":result})
-    display.sendstop()
 @socketio.on('connect')
 def handle_connect():
     sess = str(time.time())
@@ -71,4 +68,6 @@ def handle_evaluated_car(evaluation):
 
 if __name__ == "__main__":
         #display = None
+        display = Display(visible=0, size=(1400,900))
+        display.start()
         socketio.run(app,  host='0.0.0.0')

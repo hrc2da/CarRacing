@@ -44,26 +44,18 @@ def get_display(spec):
 
 class Viewer(object):
     def __init__(self, width, height, display=None):
-        print("getting display")
         if(display is None):
             display = get_display(display)
-        print("got display"+str(display))
         self.width = width
         self.height = height
-        print("getting pyglet window")
         self.window = pyglet.window.Window(width=width, height=height, display=display )
-        print("got window")
         self.window.on_close = self.window_closed_by_user
-        print("set window close")
         self.isopen = True
         self.geoms = []
         self.onetime_geoms = []
         self.transform = Transform()
-        print("instantiated class vars")
         glEnable(GL_BLEND)
-        print("enabled GL")
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        print("blended")
     def close(self):
         self.window.close()
 

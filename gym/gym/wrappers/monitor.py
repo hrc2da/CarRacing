@@ -151,7 +151,7 @@ class Monitor(Wrapper):
         if self.video_recorder is not None:
             self._close_video_recorder()
         self._flush(force=True)
-        self.env.close()
+
         # Stop tracking this for autoclose
         monitor_closer.unregister(self._monitor_id)
         self.enabled = False

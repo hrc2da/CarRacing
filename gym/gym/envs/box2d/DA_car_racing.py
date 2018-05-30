@@ -337,11 +337,8 @@ class DACarRacing(gym.Env):
 
     def render(self, mode='human',display=None):
         if self.viewer is None:
-            print("creating a viewer")
             from gym.envs.classic_control import rendering
-            print("successfully imported")
             self.viewer = rendering.Viewer(WINDOW_W, WINDOW_H,display)
-            print("instantiated viewer")
             self.score_label = pyglet.text.Label('0000', font_size=36,
                 x=20, y=WINDOW_H*2.5/40.00, anchor_x='left', anchor_y='center',
                 color=(255,255,255,255))

@@ -23,12 +23,14 @@ from keras.layers import Convolution2D, MaxPooling2D
 from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
+from keras import backend as K
 import os
 from socketIO_client import SocketIO
 
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-os.environ["DISPLAY"] = ':1'
-orig = os.environ["DISPLAY"]
+#os.environ["DISPLAY"] = ':1'
+
+#orig = os.environ["DISPLAY"]
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -94,29 +96,28 @@ def create_nn():
 #     adam = Adam(lr=0.0005)
     adamax = Adamax() #Adamax(lr=0.001)
     model.compile(loss='mse', optimizer=adamax)
-    #model.summary()
+   # model.summary()
 
     return model
 
 
 class Model:
-	def __init__(self, env):
-		self.env = env
-		self.model = create_nn()  # one feedforward nn for all actions.
+    def __init__(self, env):
+        self.env = env
+        self.model = create_nn()  # one feedforward nn for all actions.
+    
+    def predict(self, s):
+        return self.model.predict(s.reshape(-1, 111), verbose=0)[0]
 
-	def predict(self, s):
-                print("SSSS",s)
-                return self.model.predict(s.reshape(-1, 111), verbose=0)[0]
+    def update(self, s, G):
+        self.model.fit(s.reshape(-1, 111), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
 
-	def update(self, s, G):
-		self.model.fit(s.reshape(-1, 111), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
-
-	def sample_action(self, s, eps):
-		qval = self.predict(s)
-		if np.random.random() < eps:
-			return random.randint(0, 10), qval
-		else:
-			return np.argmax(qval), qval
+    def sample_action(self, s, eps):
+        qval = self.predict(s)
+        if np.random.random() < eps:
+            return random.randint(0, 10), qval
+        else:
+            return np.argmax(qval), qval
 
 
 def convert_argmax_qval_to_env_action(output_value):
@@ -189,13 +190,12 @@ def reset_video_recorder_filename(filename,env):
 
 
 def play_one(env,model, eps, gamma, config,path=None,display=None):
-    print("about to reset env")
     observation = env.reset(config,display)
-    print("Made it past env reset with path:",path)
     if(path):
+        print("setting path")
         reset_video_recorder_filename(path,env)
+    print(env.video_recorder.path)
     #env.build_car(config)
-    print("Made it past video recorder reset")
     done = False
     full_reward_received = False
     totalreward = 0
@@ -210,7 +210,6 @@ def play_one(env,model, eps, gamma, config,path=None,display=None):
         action = convert_argmax_qval_to_env_action(argmax_qval)
         # env.render()
         observation, reward, done, info = env.step(action)
-
         # a, b, c = transform(observation)
         # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
 
@@ -229,8 +228,10 @@ def play_one(env,model, eps, gamma, config,path=None,display=None):
         if iters > 300:
             print("This episode is stuck")
             break
-    if(env.video_recorder):
-        env._close_video_recorder()
+    #this is calling close video recorder in addition to env.close below, which is removing the video b/c it thinks its broken
+    #if(env.video_recorder):
+    #    print(env.video_recorder.path)
+    #    env._close_video_recorder()
     return totalreward, iters, totalfuelconsumed, totalgrasstraveled #Matt:weird order is to not break anything else
 
 def parse_config(config):
@@ -325,16 +326,19 @@ def run_vid(config = {}):
 def run_unparsed(config = {}, filename=None,display=None):
     tempdisplay = None
 #testing os level display fix
-    global orig
+    #global orig
+    #os.environ["DISPLAY"]=':1'
     #testing os level display fix
     if display is None:
-        os.environ["DISPLAY"] = ':1'
+    #    os.environ["DISPLAY"] = ':1'
         tempdisplay = Display(visible=0, size=(1400,900))
         tempdisplay.start()
         #tempdisplay = Xvfb(width=1400,height=900)
         #tempdisplay.start()
     env = gym.make('CarRacing-v1')
-    env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation')
+    env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
+    #this is to fix the problem with running keras in a separate thread and the session not getting killed
+    K.clear_session()
     model = Model(env)
     eps = 0.5/np.sqrt(1 + 900)
     gamma = 0.99
@@ -348,8 +352,8 @@ def run_unparsed(config = {}, filename=None,display=None):
     if tempdisplay is not None:
         tempdisplay.sendstop()
         tempdisplay = None
-        os.environ["DISPLAY"]=':1'
-        print("closed display")
+    #    os.environ["DISPLAY"]=':1'
+    #    print("closed display")
     return [totalreward, fuel, grass]
 
 def run_configs_from_file(filepath):
@@ -361,10 +365,10 @@ def run_configs_from_file(filepath):
         print(car['reward'])
         run_unparsed(car['config'])
 if __name__=='__main__':
-    #disp = Display(visible=0,size=(1400,900))
-    #disp.start()
+    disp = Display(visible=0,size=(1400,900))
+    disp.start()
     #init_buffer()
     run_unparsed(filename="testrun1.mp4",display=None)
     run_unparsed(filename="testrun2.mp4",display=None)
     #kill_buffer()
-    #disp.sendstop()
+    disp.sendstop()
