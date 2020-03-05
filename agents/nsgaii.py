@@ -1,11 +1,12 @@
 import sys, traceback
 import random
 sys.path.append('/share/sandbox/')
+sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 #from schwimmbad import MultiPool
 from platypus import NSGAII, Problem, Type, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job, Generator
 from platypus.config import default_variator
 from collections import namedtuple
-from carracing.keras_trainer.run_car import run, init_buffer, kill_buffer
+from keras_trainer.run_car import run, init_buffer, kill_buffer
 '''
 Car Config Format:
 self.eng_power = int

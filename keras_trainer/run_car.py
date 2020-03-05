@@ -76,29 +76,32 @@ def compute_steering_speed_gyro_abs(a):
 
 
 def create_nn():
-    if os.path.exists('race-car.h5'):
-        return load_model('race-car.h5')
+    trained_model = os.path.join(os.getcwd(),"keras_trainer/race-car.h5")
+    try:
+        m = load_model(trained_model)
+        return m
+    except FileNotFoundError:
+        print('did not find a model')
+        model = Sequential()
+        model.add(Dense(512, kernel_initializer='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
+        model.add(Activation('relu'))
 
-    model = Sequential()
-    model.add(Dense(512, kernel_initializer='lecun_uniform', input_shape=(111,)))# 7x7 + 3.  or 14x14 + 3
-    model.add(Activation('relu'))
+    #     model.add(Dense(512, init='lecun_uniform'))
+    #     model.add(Activation('relu'))
+    #     model.add(Dropout(0.3))
 
-#     model.add(Dense(512, init='lecun_uniform'))
-#     model.add(Activation('relu'))
-#     model.add(Dropout(0.3))
+        model.add(Dense(11, kernel_initializer='lecun_uniform'))
+        model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-    model.add(Dense(11, kernel_initializer='lecun_uniform'))
-    model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
+    #     rms = RMSprop(lr=0.005)
+    #     sgd = SGD(lr=0.1, decay=0.0, momentum=0.0, nesterov=False)
+    # try "adam"
+    #     adam = Adam(lr=0.0005)
+        adamax = Adamax() #Adamax(lr=0.001)
+        model.compile(loss='mse', optimizer=adamax)
+    # model.summary()
 
-#     rms = RMSprop(lr=0.005)
-#     sgd = SGD(lr=0.1, decay=0.0, momentum=0.0, nesterov=False)
-# try "adam"
-#     adam = Adam(lr=0.0005)
-    adamax = Adamax() #Adamax(lr=0.001)
-    model.compile(loss='mse', optimizer=adamax)
-   # model.summary()
-
-    return model
+        return model
 
 
 class Model:
@@ -165,6 +168,7 @@ def convert_argmax_qval_to_env_action(output_value):
 def reset_video_recorder_filename(filename,env):
     if env.video_recorder:
         env._close_video_recorder()
+    print("FILENAME IN VR: ", filename)
     env.video_recorder = video_recorder.VideoRecorder(
                 env=env,
                 path=os.path.join(env.directory,filename),
@@ -190,11 +194,17 @@ def reset_video_recorder_filename(filename,env):
 
 
 def play_one(env,model, eps, gamma, config,path=None,display=None):
-    observation = env.reset(config,display)
-    if(path):
-        print("setting path")
-        reset_video_recorder_filename(path,env)
-    print(env.video_recorder.path)
+    print("="*30)
+    print('config is: ', config)
+    print('display is: ', display)
+    print("="*30)
+    # observation = env.reset(config,display)
+    observation = env.reset(config)
+    # if(path):
+    print("setting path")
+    print("PATH IS: ", path)
+    reset_video_recorder_filename(path,env)
+    # print(env.video_recorder.path)
     #env.build_car(config)
     done = False
     full_reward_received = False
@@ -294,7 +304,9 @@ def run(config = {},session_id=None):
 
     totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config)
     env.close()
-    with open("/share/sandbox/carracing/logged_cars.txt", "a+") as carfile:
+    zhilong_car_log = '/home/zhilong/Documents/HRC/CarRacing/logged_cars.txt'
+    old_log = "/share/sandbox/carracing/logged_cars.txt"
+    with open(zhilong_car_log, "a+") as carfile:
         carfile.write(str(config)+","+str(totalreward)+","+ str(fuel)+","+str(grass)+"\n")
     with SocketIO('127.0.0.1','5000') as SIO:
         SIO.emit('evaluated_car',{"session_id":session_id,"car":{'config':config,'reward':totalreward,'fuel':fuel, 'grass':grass}})
@@ -324,6 +336,7 @@ def run_vid(config = {}):
     return [totalreward, fuel, grass]
 
 def run_unparsed(config = {}, filename=None,display=None):
+    print("running unparsed")
     tempdisplay = None
 #testing os level display fix
     #global orig

@@ -3,8 +3,11 @@ from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
 import os,sys
 sys.path.append('/share/sandbox/')
-from carracing.agents.nsgaii import nsgaii_agent
-from carracing.keras_trainer.run_car import run_unparsed
+sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+#from carracing.agents.nsgaii import nsgaii_agent
+from agents.nsgaii import nsgaii_agent
+#from carracing.keras_trainer.run_car import run_unparsed
+from keras_trainer.run_car import run_unparsed
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -30,6 +33,7 @@ def about():
 @app.route("/testdrive", methods=['POST'])
 def testdrive():
     carConfig = request.get_json()
+    print("TEST DRIVING")
     #create a unique filename.mp4
     filename = uuid.uuid4().hex+'.mp4'
     #run the car with it
@@ -52,13 +56,14 @@ def handle_connect():
 def start_ga(sess):
     agent = nsgaii_agent(sess)
     t = threading.Thread(target=agent.run)
-    t.start()
+    # t.start()
 
 
 @socketio.on('evaluated_car')
 def handle_evaluated_car(evaluation):
     global max_reward
-    emit('ga_car', evaluation, json=True, broadcast=True)
+    # changed 2/21/20
+    emit('ga_car', {"config":evaluation['car']["config"],"result":{k:v for k,v in evaluation['car'] if k is not 'config'}}, json=True, broadcast=True)
     if(evaluation['car']['reward'] > max_reward):
         max_reward = evaluation['car']['reward']
         with open("best_configs.json", 'a+') as outfile:
