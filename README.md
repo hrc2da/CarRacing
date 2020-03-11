@@ -9,6 +9,7 @@ Make sure to install:
 * cairo and dependencies `sudo apt install libcairo2-dev pkg-config python3-dev`
 * pycurl (the pip wheel is broken, to install on Ubuntu 18.04+, `sudo apt install python3-pycurl` and delete from requirements.txt)
 * pygobject `sudo apt install libgirepository1.0-dev`
+* tkinter if it's not installed `sudo apt install python3-tk`
 * also for now `pip install six`. I will open an issue to fix the requirements file.
 
 ## Environment
