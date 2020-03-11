@@ -8,6 +8,7 @@ Make sure to install:
 * swig `sudo apt install swig`
 * cairo and dependencies `sudo apt install libcairo2-dev pkg-config python3-dev`
 * pycurl (the pip wheel is broken, to install on Ubuntu 18.04+, `sudo apt install python3-pycurl` and delete from requirements.txt)
+* also for now `pip install six`. I will open an issue to fix the requirements file.
 
 ## Environment
 We use OpenAI Gym's Car-Racing-v0 Environment as the base of our environment. In the provided environment, we have augmented the Controlling and Dynamics modules to work with car configurations that we provide from either a Genetic Algorithm or from the user. To do this we had to define an intermediate car configuration, write parsing methods to transition from an image to our configuration spec, and then translate the configuration into a Car class that would interact with the provided environment. 
