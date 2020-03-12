@@ -216,15 +216,15 @@ def play_one(env,model, eps, gamma, config,path=None,display=None):
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
         argmax_qval, qval = model.sample_action(state, eps)
-        # prev_state = state
+        prev_state = state
         action = convert_argmax_qval_to_env_action(argmax_qval)
         # env.render()
         observation, reward, done, info = env.step(action)
         # a, b, c = transform(observation)
         # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
 
-        # update the model
-        # standard Q learning TD(0)
+        # # update the model
+        # # standard Q learning TD(0)
         # next_qval = model.predict(state)
         # G = reward + gamma*np.max(next_qval)
         # y = qval[:]
@@ -377,6 +377,7 @@ def run_configs_from_file(filepath):
     for car in configs:
         print(car['reward'])
         run_unparsed(car['config'])
+        
 if __name__=='__main__':
     disp = Display(visible=0,size=(1400,900))
     disp.start()

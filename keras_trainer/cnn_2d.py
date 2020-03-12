@@ -12,10 +12,11 @@ from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Merge
 from keras.utils import np_utils, plot_model
 from keras.models import load_model
+from pprint import pprint
 import cv2
 
 def plot_running_avg(totalrewards):
@@ -27,6 +28,13 @@ def plot_running_avg(totalrewards):
   plt.title("Running Average")
   plt.show()
 
+env = gym.make('CarRacing-v1')
+env = wrappers.Monitor(env, 'monitor-folder', force=True)
+# obs = env.reset()
+# gray = cv2.cvtColor(obs, cv2.COLOR_BGR2GRAY)
+# plt.imshow(gray)
+# plt.show()
+# print("screen size: ", gray.shape)
 
 def transform(s):
     bottom_black_bar = s[84:, 12:]
@@ -39,13 +47,12 @@ def transform(s):
     img = cv2.cvtColor(upper_field, cv2.COLOR_RGB2GRAY)
     upper_field_bw = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)[1]
     upper_field_bw = cv2.resize(upper_field_bw, (10, 10), interpolation = cv2.INTER_NEAREST) # re scaled to 7x7 pixels
-    # cv2.imshow('video', upper_field_bw)
-    # cv2.waitKey(1)
+#     cv2.imshow('video', upper_field_bw)
+#     cv2.waitKey(1)
     upper_field_bw = upper_field_bw.astype('float')/255
         
     car_field = s[66:78, 43:53]
     img = cv2.cvtColor(car_field, cv2.COLOR_RGB2GRAY)
-    # plt.imshow(img)
     car_field_bw = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY)[1]
 
 #     print(car_field_bw[:, 3].mean()/255, car_field_bw[:, 4].mean()/255, car_field_bw[:, 5].mean()/255, car_field_bw[:, 6].mean()/255)
@@ -79,22 +86,28 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn():
-    trained_model = os.path.join(os.getcwd(),"keras_trainer/train_car_test.h5")
-    # if os.path.exists('race-car.h5'):
-    #     return load_model('race-car.h5')
-        
-    model = Sequential()
-    model.add(Dense(512, input_shape=(111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3
-    model.add(Activation('relu'))
+def create_nn(input_shape):
 
-#     model.add(Dense(512, init='lecun_uniform'))
-#     model.add(Activation('relu'))
-#     model.add(Dropout(0.3))
+    model = Sequential()
+    # add convolutional layers
+    model.add(Conv2D(32, 2, strides=(4,4),
+                              padding='valid',
+                              activation='relu',
+                              input_shape=input_shape))
+
+        # Third convolutional layer
+    model.add(Conv2D(64, 1, strides=(1,1),
+                            padding='valid',
+                            activation='relu',
+                            input_shape=input_shape))
+        # Flatten the convolution output
+    model.add(Flatten())
+ # a # a
+    model.add(Dense(512, kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
+    model.add(Activation('relu'))
 
     model.add(Dense(11, kernel_initializer="lecun_uniform"))
     model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
-
 
     adamax = Adamax() #Adamax(lr=0.001)
     model.compile(loss='mse', optimizer=adamax)
@@ -104,22 +117,24 @@ def create_nn():
 
 
 class Model:
-	def __init__(self, env):
-		self.env = env
-		self.model = create_nn()  # one feedforward nn for all actions.
+    def __init__(self, env):
+        self.env = env
+        self.model = create_nn((4, 96, 96))  # 4 consecutive steps, 111-element vector for each state
 
-	def predict(self, s):
-		return self.model.predict(s.reshape(-1, vector_size), verbose=0)[0]
+    def predict(self, s):
+        # print("shape is ", np.reshape(s, (1, 4, 111)).shape)
+        return self.model.predict(np.expand_dims(s, axis=0), verbose=0)[0]
 
-	def update(self, s, G):
-		self.model.fit(s.reshape(-1, vector_size), np.array(G).reshape(-1, 11), epochs=1, verbose=0)
+    def update(self, s, G):
+        self.model.fit(np.expand_dims(s, axis=0), np.array(G).reshape(-1, 11), epochs=1, verbose=0)
 
-	def sample_action(self, s, eps):
-		qval = self.predict(s)
-		if np.random.random() < eps:
-			return random.randint(0, 10), qval
-		else:
-			return np.argmax(qval), qval
+    def sample_action(self, s, eps):
+        # print('THE SHAPE FOR PREDICTION: ', s.shape)
+        qval = self.predict(s)
+        if np.random.random() < eps:
+            return random.randint(0, 10), qval
+        else:
+            return np.argmax(qval), qval
 
 
 def convert_argmax_qval_to_env_action(output_value):
@@ -156,9 +171,6 @@ def convert_argmax_qval_to_env_action(output_value):
         
     control_display = np.concatenate((brake_display, gaz_display), axis=1)
 
-    # cv2.imshow('controls', control_display)
-    # cv2.waitKey(1)
-    
     return [steering, gaz, brake]
 
 def play_one(env, model, eps, gamma):
@@ -167,22 +179,28 @@ def play_one(env, model, eps, gamma):
     full_reward_received = False
     totalreward = 0
     iters = 0
-    total_max_q = 0
+    # a, b, c = transform(observation)
+    # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+    state = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)
+    # pprint(np.array([state,state,state, state]))
+    stacked_state = np.array([state,state,state, state])
+
     while not done:
-        a, b, c = transform(observation)
-        state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        argmax_qval, qval = model.sample_action(state, eps)
-        prev_state = state
+        # a, b, c = transform(observation)
+        # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+        # print("STATE SHAPE: ", stacked_state.shape)
+        argmax_qval, qval = model.sample_action(stacked_state, eps)
+        prev_state = stacked_state
         action = convert_argmax_qval_to_env_action(argmax_qval)
         observation, reward, done, info = env.step(action)
 
-        a, b, c = transform(observation)        
-        state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        
+        # a, b, c = transform(observation)        
+        # curr_state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+        curr_state = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)
+        stacked_state = np.append(stacked_state[1:], [curr_state], axis=0) # appending the lastest frame, pop the oldest
         # update the model
         # standard Q learning TD(0)
-        next_qval = model.predict(state)
-        total_max_q += np.max(next_qval)
+        next_qval = model.predict(stacked_state)
         G = reward + gamma*np.max(next_qval)
         y = qval[:]
         y[argmax_qval] = G
@@ -194,26 +212,20 @@ def play_one(env, model, eps, gamma):
             print("This episode is stuck")
             break
         
-    return totalreward, iters, total_max_q/iters
+    return totalreward, iters
 
-
-
-env = gym.make('CarRacing-v1')
-env = wrappers.Monitor(env, 'monitor-folder', force=True)
 model = Model(env)
-plot_model(model.model, 'noncnn_model.png', show_shapes=True)
+plot_model(model.model, '2D_cnn_model.png', show_shapes=True)
 gamma = 0.99
-trained_model = os.path.join(os.getcwd(),"keras_trainer/train_car_test.h5")
-N = 102
+trained_model = os.path.join(os.getcwd(),"cnn_train_car_test.h5")
+N = 100
 totalrewards = np.empty(N)
 costs = np.empty(N)
-avg_q_history = []
 for n in range(N):
     eps = 0.5/np.sqrt(n+1 + 900) 
-    totalreward, iters, avg_q = play_one(env, model, eps, gamma)
-    avg_q_history.append(avg_q)
+    totalreward, iters = play_one(env, model, eps, gamma)
     totalrewards[n] = totalreward
-    print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg q val", avg_q, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
+    print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
     # if n % 10 == 0:
     #     model.model.save('race-car.h5')
 
@@ -223,12 +235,6 @@ print("total steps:", totalrewards.sum())
 plt.plot(totalrewards)
 plt.title("Rewards")
 plt.show()
-plt.close()
-
-plt.plot(avg_q_history)
-plt.title("average q values")
-plt.show()
-plt.close()
 
 plot_running_avg(totalrewards)
 
