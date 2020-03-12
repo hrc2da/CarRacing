@@ -3,7 +3,7 @@ from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
 import os,sys
 sys.path.append('/share/sandbox/')
-sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+sys.path.append('/home/hrc2/hrcd/cars/carracing')
 #from carracing.agents.nsgaii import nsgaii_agent
 from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
