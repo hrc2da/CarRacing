@@ -26,7 +26,8 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  plt.show()
+  fname = os.path.join(os.getcwd(), "dqn_500_running_avg.png")
+  plt.savefig(fname)
 
 
 def transform(s):
@@ -222,16 +223,17 @@ class DQNAgent():
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
         # save model
-        trained_model = os.path.join(os.getcwd(),"dqn_train_car_test.h5")
+        trained_model = os.path.join(os.getcwd(),"dqn_train_car_500.h5")
         self.model.model.save(trained_model)
         plt.plot(totalrewards)
+        rp_name = os.path.join(os.getcwd(), "dqn_500_rewards.png")
         plt.title("Rewards")
-        plt.show()
+        plt.savefig(rp_name)
         plot_running_avg(totalrewards)
         env.close()
 
 if __name__ == "__main__":
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=True)
-    trainer = DQNAgent(env, 200)
+    trainer = DQNAgent(env, 500)
     trainer.train()
