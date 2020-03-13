@@ -26,7 +26,7 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "dqn_500_running_avg.png")
+  fname = os.path.join(os.getcwd(), "dqn_1000_running_avg.png")
   plt.savefig(fname)
 
 
@@ -222,18 +222,20 @@ class DQNAgent():
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
-        # save model
-        trained_model = os.path.join(os.getcwd(),"dqn_train_car_500.h5")
-        self.model.model.save(trained_model)
+            if n>0 and n%50==0:
+                # save model
+                trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
+                self.model.model.save(trained_model)
         plt.plot(totalrewards)
-        rp_name = os.path.join(os.getcwd(), "dqn_500_rewards.png")
+        rp_name = os.path.join(os.getcwd(), "dqn_1000_rewards.png")
         plt.title("Rewards")
         plt.savefig(rp_name)
+        plt.close()
         plot_running_avg(totalrewards)
         env.close()
 
 if __name__ == "__main__":
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=True)
-    trainer = DQNAgent(env, 500)
+    trainer = DQNAgent(env, 1000)
     trainer.train()
