@@ -4,10 +4,12 @@ from flask_cors import CORS
 import os,sys
 sys.path.append('/share/sandbox/')
 sys.path.append('/home/hrc2/hrcd/cars/carracing')
+# sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 #from carracing.agents.nsgaii import nsgaii_agent
 from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
-from keras_trainer.run_car import run_unparsed
+# from keras_trainer.run_car import run_unparsed
+from keras_trainer.run_dqn_car import run_unparsed
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
