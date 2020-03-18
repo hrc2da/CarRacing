@@ -14,7 +14,7 @@ from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.utils import np_utils, plot_model
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 from keras import backend as K
 from pprint import pprint
 import cv2
@@ -101,9 +101,10 @@ def create_nn(model_to_load):
         return model
 
 class DQNAgent():
-    def __init__(self, num_episodes, model_name=None):
+    def __init__(self, num_episodes, model_name=None, carConfig=None):
         env = gym.make('CarRacing-v1')
         env = wrappers.Monitor(env, 'monitor-folder', force=True)
+        self.carConfig = carConfig
         self.env = env
         self.gamma = 0.99
         self.model_name = model_name
@@ -190,7 +191,12 @@ class DQNAgent():
 
 
     def play_one(self, eps):
-        observation = self.env.reset()
+        if self.carConfig:
+            print("TRAINING WITH CAR CONFIG: ")
+            print(self.carConfig)
+            observation = self.env.reset(self.carConfig)
+        else: 
+            observation = self.env.reset()
         done = False
         full_reward_received = False
         totalreward = 0
