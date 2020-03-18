@@ -49,10 +49,9 @@ def testdrive(train=False):
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    # trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500.h5")
-    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_trained_model_50.h5")
+    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500_retrain.h5")
     if train == True:        
-        trainer = DQNAgent(1, trained_model_name)
+        trainer = DQNAgent(10, trained_model_name)
         trainer.train()
     with ThreadPoolExecutor(max_workers=4) as e:
         simulation = e.submit(run_unparsed, carConfig, filename, display, trained_model_name) #pass true if display is enabled

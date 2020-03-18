@@ -334,6 +334,7 @@ def run_unparsed(config = {}, filename=None,display=None,model_name=None):
     if tempdisplay is not None:
         tempdisplay.sendstop()
         tempdisplay = None
+    K.clear_session()
     return [totalreward, fuel, grass]
 
 def run_configs_from_file(filepath):

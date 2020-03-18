@@ -244,41 +244,41 @@ class DQNAgent():
                 # save model
                 trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
-            if self.model_name:
-                print('saving: ', self.model_name)
-                self.model.save(self.model_name)
-        print(self.model)
-        print("INITIAL WEIGHTS: ")
-        pprint(self.init_weights)
-        print("FINAL WEIGHTS: ")
-        pprint(self.model.get_weights())
-        print("DIFFERENCE")
-        weight_diff = abs(np.array(self.model.get_weights())-np.array(self.init_weights))
-        # pprint(weight_diff)
-        print("PERCENTAGE CHANGE layer 1: ")
-        layer1 = weight_diff[0]/self.init_weights[0] * 100
-        # pprint(layer1)
-        print("MAX of layer: ", np.max(layer1))
-        print("mean of layer: ", np.mean(layer1))
+        if self.model_name:
+            print('saving: ', self.model_name)
+            self.model.save(self.model_name)
+        # print(self.model)
+        # print("INITIAL WEIGHTS: ")
+        # pprint(self.init_weights)
+        # print("FINAL WEIGHTS: ")
+        # pprint(self.model.get_weights())
+        # print("DIFFERENCE")
+        # weight_diff = abs(np.array(self.model.get_weights())-np.array(self.init_weights))
+        # # pprint(weight_diff)
+        # print("PERCENTAGE CHANGE layer 1: ")
+        # layer1 = weight_diff[0]/self.init_weights[0] * 100
+        # # pprint(layer1)
+        # print("MAX of layer: ", np.max(layer1))
+        # print("mean of layer: ", np.mean(layer1))
 
-        print("PERCENTAGE CHANGE layer 2: ")
-        layer2 = weight_diff[1]/self.init_weights[1] * 100
-        # pprint(layer2)
-        print("MAX of layer: ", np.max(layer2))
-        print("mean of layer: ", np.mean(layer2))
+        # print("PERCENTAGE CHANGE layer 2: ")
+        # layer2 = weight_diff[1]/self.init_weights[1] * 100
+        # # pprint(layer2)
+        # print("MAX of layer: ", np.max(layer2))
+        # print("mean of layer: ", np.mean(layer2))
 
-        print("PERCENTAGE CHANGE layer 3: ")
-        layer3 = weight_diff[2]/self.init_weights[2] * 100
-        # pprint(layer3)
-        print("MAX of layer: ", np.max(layer3))
-        print("mean of layer: ", np.mean(layer3))
+        # print("PERCENTAGE CHANGE layer 3: ")
+        # layer3 = weight_diff[2]/self.init_weights[2] * 100
+        # # pprint(layer3)
+        # print("MAX of layer: ", np.max(layer3))
+        # print("mean of layer: ", np.mean(layer3))
 
 
-        print("PERCENTAGE CHANGE layer 4: ")
-        layer4 = weight_diff[3]/self.init_weights[3] * 100
-        # pprint(layer4)
-        print("MAX of layer: ", np.max(layer4))
-        print("mean of layer: ", np.mean(layer4))
+        # print("PERCENTAGE CHANGE layer 4: ")
+        # layer4 = weight_diff[3]/self.init_weights[3] * 100
+        # # pprint(layer4)
+        # print("MAX of layer: ", np.max(layer4))
+        # print("mean of layer: ", np.mean(layer4))
 
 
         if not self.model_name:
