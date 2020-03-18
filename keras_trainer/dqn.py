@@ -101,7 +101,7 @@ def create_nn(model_to_load):
         return model
 
 class DQNAgent():
-    def __init__(self, num_episodes, model_name=None, carConfig=None):
+    def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
         env = gym.make('CarRacing-v1')
         env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
@@ -110,10 +110,11 @@ class DQNAgent():
         self.model_name = model_name
         self.model, self.init_weights = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
         self.model.summary()
+        self.replay_freq = replay_freq
         if not model_name:
             MEMORY_SIZE = 10000
         else:
-            MEMORY_SIZE = 1000  # smaller memory for retraining
+            MEMORY_SIZE = 5000  # smaller memory for retraining
         self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         self.num_episodes = num_episodes
 
@@ -221,13 +222,13 @@ class DQNAgent():
             # add to memory
             self.memory.append((prev_state, argmax_qval, reward, stacked_state))
             # replay batch from memory every 20 steps
-            REPLAY_FREQ = 32
-            if iters % REPLAY_FREQ==0 and iters>10:
-                try:
-                    self.replay(32)
-                except Exception as e: # will error if the memory size not enough for minibatch yet
-                    print("error when replaying: ", e)
-                    raise e
+            if self.replay_freq!=0:
+                if iters % self.replay_freq==0 and iters>10:
+                    try:
+                        self.replay(32)
+                    except Exception as e: # will error if the memory size not enough for minibatch yet
+                        print("error when replaying: ", e)
+                        raise e
 
             totalreward += reward
             iters += 1
@@ -235,8 +236,10 @@ class DQNAgent():
             if iters > 1500:
                 print("This episode is stuck")
                 break
-        # for i in range(20):
-        #     self.replay(100)
+        if self.replay_freq==0:
+            print("replaying only at the end")
+            for _ in range(int(1000/32)):
+                self.replay(32)
         return totalreward, iters
 
     def train(self, retrain=False):
