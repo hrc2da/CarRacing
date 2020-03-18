@@ -80,9 +80,10 @@ vector_size = 10*10 + 7 + 4
 def create_nn(model_to_load):
     try:
         m = load_model(model_to_load)
-        K.set_value(m.optimizer.lr, 0.10) # set a higher LR for retraining
+        # K.set_value(m.optimizer.lr, 0.01) # set a higher LR for retraining
         print("Loaded pretrained model " + model_to_load)
-        return m
+        init_weights = m.get_weights()
+        return m, init_weights
     except FileNotFoundError:
         print("Creating new network")
         model = Sequential()
@@ -106,7 +107,8 @@ class DQNAgent():
         self.env = env
         self.gamma = 0.99
         self.model_name = model_name
-        self.model = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
+        self.model, self.init_weights = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
+        self.model.summary()
         if not model_name:
             MEMORY_SIZE = 10000
         else:
@@ -213,13 +215,13 @@ class DQNAgent():
             # add to memory
             self.memory.append((prev_state, argmax_qval, reward, stacked_state))
             # replay batch from memory every 20 steps
-            if iters % 50 == 0 and iters > 0:
-               print("Retraining at {} iterations and {}.\n".format(iters,time.time()))
-               try:
-                   self.replay(32)
-               except Exception as e: # will error if the memory size not enough for minibatch yet
-                   print("error when replaying: ", e)
-                   raise e
+            REPLAY_FREQ = 32
+            if iters % REPLAY_FREQ==0 and iters>10:
+                try:
+                    self.replay(32)
+                except Exception as e: # will error if the memory size not enough for minibatch yet
+                    print("error when replaying: ", e)
+                    raise e
 
             totalreward += reward
             iters += 1
@@ -244,7 +246,42 @@ class DQNAgent():
                 trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
             if self.model_name:
+                print('saving: ', self.model_name)
                 self.model.save(self.model_name)
+        print(self.model)
+        print("INITIAL WEIGHTS: ")
+        pprint(self.init_weights)
+        print("FINAL WEIGHTS: ")
+        pprint(self.model.get_weights())
+        print("DIFFERENCE")
+        weight_diff = abs(np.array(self.model.get_weights())-np.array(self.init_weights))
+        # pprint(weight_diff)
+        print("PERCENTAGE CHANGE layer 1: ")
+        layer1 = weight_diff[0]/self.init_weights[0] * 100
+        # pprint(layer1)
+        print("MAX of layer: ", np.max(layer1))
+        print("mean of layer: ", np.mean(layer1))
+
+        print("PERCENTAGE CHANGE layer 2: ")
+        layer2 = weight_diff[1]/self.init_weights[1] * 100
+        # pprint(layer2)
+        print("MAX of layer: ", np.max(layer2))
+        print("mean of layer: ", np.mean(layer2))
+
+        print("PERCENTAGE CHANGE layer 3: ")
+        layer3 = weight_diff[2]/self.init_weights[2] * 100
+        # pprint(layer3)
+        print("MAX of layer: ", np.max(layer3))
+        print("mean of layer: ", np.mean(layer3))
+
+
+        print("PERCENTAGE CHANGE layer 4: ")
+        layer4 = weight_diff[3]/self.init_weights[3] * 100
+        # pprint(layer4)
+        print("MAX of layer: ", np.max(layer4))
+        print("mean of layer: ", np.mean(layer4))
+
+
         if not self.model_name:
             plt.plot(totalrewards)
             rp_name = os.path.join(os.getcwd(), "dqn_1000_rewards.png")
