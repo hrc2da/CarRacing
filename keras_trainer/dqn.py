@@ -1,4 +1,5 @@
 import gym
+import time
 import os
 import sys
 import numpy as np
@@ -12,9 +13,8 @@ from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Merge
 from keras.utils import np_utils, plot_model
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 from keras import backend as K
 from pprint import pprint
 import cv2
@@ -80,7 +80,7 @@ vector_size = 10*10 + 7 + 4
 def create_nn(model_to_load):
     try:
         m = load_model(model_to_load)
-        K.set_value(m.optimizer.lr, 0.002) # set a higher LR for retraining
+        K.set_value(m.optimizer.lr, 0.10) # set a higher LR for retraining
         print("Loaded pretrained model " + model_to_load)
         return m
     except FileNotFoundError:
@@ -213,12 +213,13 @@ class DQNAgent():
             # add to memory
             self.memory.append((prev_state, argmax_qval, reward, stacked_state))
             # replay batch from memory every 20 steps
-            if iters % 20:
-                try:
-                    self.replay(32)
-                except Exception as e: # will error if the memory size not enough for minibatch yet
-                    print("error when replaying: ", e)
-                    raise e
+            if iters % 50 == 0 and iters > 0:
+               print("Retraining at {} iterations and {}.\n".format(iters,time.time()))
+               try:
+                   self.replay(32)
+               except Exception as e: # will error if the memory size not enough for minibatch yet
+                   print("error when replaying: ", e)
+                   raise e
 
             totalreward += reward
             iters += 1
@@ -226,7 +227,8 @@ class DQNAgent():
             if iters > 1500:
                 print("This episode is stuck")
                 break
-            
+        # for i in range(20):
+        #     self.replay(100)
         return totalreward, iters
 
     def train(self, retrain=False):
