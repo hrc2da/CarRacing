@@ -3,8 +3,9 @@ from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
 import os,sys
 # sys.path.append('/share/sandbox/')
-# sys.path.append('/home/hrc2/hrcd/cars/carracing')
+sys.path.append('/home/hrc2/hrcd/cars/carracing')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+sys.path.append('/home/dev/scratch/cars/carracing')
 #from carracing.agents.nsgaii import nsgaii_agent
 from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
@@ -33,8 +34,12 @@ def about():
     data = {"msg":"This is a simulated workspace where you can design racecars for OpenAI Gym's CarRacing environment."}
     return jsonify(data)
 
+@app.route("/traindriver", methods=['POST'])
+def traindriver():
+    return testdrive(train=True)
+
 @app.route("/testdrive", methods=['POST'])
-def testdrive():
+def testdrive(train=False):
     carConfig = request.get_json()
     print("TEST DRIVING")
     #create a unique filename.mp4
@@ -44,9 +49,11 @@ def testdrive():
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500.h5")
-    # trainer = DQNAgent(15, trained_model_name)
-    # trainer.train()
+    # trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500.h5")
+    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_trained_model_50.h5")
+    if train == True:        
+        trainer = DQNAgent(1, trained_model_name)
+        trainer.train()
     with ThreadPoolExecutor(max_workers=4) as e:
         simulation = e.submit(run_unparsed, carConfig, filename, display, trained_model_name) #pass true if display is enabled
     #let's try this for now, but blocking isn't going to work if >1 user.
