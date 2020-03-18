@@ -2,14 +2,15 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
 import os,sys
-sys.path.append('/share/sandbox/')
-sys.path.append('/home/hrc2/hrcd/cars/carracing')
-# sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+# sys.path.append('/share/sandbox/')
+# sys.path.append('/home/hrc2/hrcd/cars/carracing')
+sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 #from carracing.agents.nsgaii import nsgaii_agent
 from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
 # from keras_trainer.run_car import run_unparsed
 from keras_trainer.run_dqn_car import run_unparsed
+from keras_trainer.dqn import DQNAgent
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -42,8 +43,12 @@ def testdrive():
     #t = threading.Thread(target=run_unparsed, args=(carConfig,os.path.join('../static',filename))) #this is a hack to write outside the monitor-files dir
     #t.start()
     #t.join()
+    # want to train it for a few episodes first
+    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500.h5")
+    # trainer = DQNAgent(1, trained_model_name)
+    # trainer.train()
     with ThreadPoolExecutor(max_workers=4) as e:
-        simulation = e.submit(run_unparsed, carConfig, filename, display) #pass true if display is enabled
+        simulation = e.submit(run_unparsed, carConfig, filename, display, trained_model_name) #pass true if display is enabled
     #let's try this for now, but blocking isn't going to work if >1 user.
     #potential solution: redis+celery (blog.miguelgrinberg.com/post/using-celery-with-flask
         return jsonify({"video":filename, "result":simulation.result()})

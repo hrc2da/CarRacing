@@ -15,6 +15,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Merge
 from keras.utils import np_utils, plot_model
 from keras.models import load_model
+from keras import backend as K
 from pprint import pprint
 import cv2
 import ringbuffer
@@ -76,27 +77,40 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn():        
-    model = Sequential()
- # 4 frames vertically concatenated
-    model.add(Dense(512, input_shape=(4*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
-    model.add(Activation('relu'))
+def create_nn(model_to_load):
+    try:
+        m = load_model(model_to_load)
+        K.set_value(m.optimizer.lr, 0.002) # set a higher LR for retraining
+        print("Loaded pretrained model " + model_to_load)
+        return m
+    except FileNotFoundError:
+        print("Creating new network")
+        model = Sequential()
+    # 4 frames vertically concatenated
+        model.add(Dense(512, input_shape=(4*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
+        model.add(Activation('relu'))
 
-    model.add(Dense(11, kernel_initializer="lecun_uniform"))
-    model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
+        model.add(Dense(11, kernel_initializer="lecun_uniform"))
+        model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-    adamax = Adamax() #Adamax(lr=0.001)
-    model.compile(loss='mse', optimizer=adamax)
-    model.summary()
-    
-    return model
+        adamax = Adamax() #Adamax(lr=0.001)
+        model.compile(loss='mse', optimizer=adamax)
+        model.summary()
+        
+        return model
 
 class DQNAgent():
-    def __init__(self, env, num_episodes):
+    def __init__(self, num_episodes, model_name=None):
+        env = gym.make('CarRacing-v1')
+        env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.env = env
         self.gamma = 0.99
-        self.model = create_nn()  # 4 consecutive steps, 111-element vector for each state
-        MEMORY_SIZE = 10000
+        self.model_name = model_name
+        self.model = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
+        if not model_name:
+            MEMORY_SIZE = 10000
+        else:
+            MEMORY_SIZE = 1000  # smaller memory for retraining
         self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         self.num_episodes = num_episodes
 
@@ -215,27 +229,29 @@ class DQNAgent():
             
         return totalreward, iters
 
-    def train(self):
+    def train(self, retrain=False):
         totalrewards = np.empty(self.num_episodes)
         for n in range(self.num_episodes):
+            print("training ", str(n))
             eps = 0.5/np.sqrt(n + 1000)
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
-            if n>0 and n%50==0:
+            if n>0 and n%50==0 and not self.model_name:
                 # save model
                 trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
-        plt.plot(totalrewards)
-        rp_name = os.path.join(os.getcwd(), "dqn_1000_rewards.png")
-        plt.title("Rewards")
-        plt.savefig(rp_name)
-        plt.close()
-        plot_running_avg(totalrewards)
-        env.close()
+            if self.model_name:
+                self.model.save(self.model_name)
+        if not self.model_name:
+            plt.plot(totalrewards)
+            rp_name = os.path.join(os.getcwd(), "dqn_1000_rewards.png")
+            plt.title("Rewards")
+            plt.savefig(rp_name)
+            plt.close()
+            plot_running_avg(totalrewards)
+        self.env.close()
 
 if __name__ == "__main__":
-    env = gym.make('CarRacing-v1')
-    env = wrappers.Monitor(env, 'monitor-folder', force=True)
-    trainer = DQNAgent(env, 1000)
+    trainer = DQNAgent(1000)
     trainer.train()

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import gym.spaces
 import gym.wrappers as wrappers
 from gym.wrappers.monitoring import stats_recorder, video_recorder
-#from gym import wrappers
 from datetime import datetime
 import random
 from pyvirtualdisplay import Display
@@ -26,6 +25,8 @@ from keras.models import load_model
 from keras import backend as K
 import os
 from socketIO_client import SocketIO
+import ringbuffer
+
 
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 #os.environ["DISPLAY"] = ':1'
@@ -75,7 +76,8 @@ def compute_steering_speed_gyro_abs(a):
     return [steering, speed, gyro, abs1, abs2, abs3, abs4]
 
 
-def create_nn(trained_model):
+def create_nn():
+    trained_model = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500_retrain.h5")
     try:
         m = load_model(trained_model)
         return m
@@ -88,27 +90,23 @@ def create_nn(trained_model):
         model.add(Dense(11, kernel_initializer='lecun_uniform'))
         model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-    #     rms = RMSprop(lr=0.005)
-    #     sgd = SGD(lr=0.1, decay=0.0, momentum=0.0, nesterov=False)
-    # try "adam"
-    #     adam = Adam(lr=0.0005)
-        adamax = Adamax() #Adamax(lr=0.001)
+        adamax = Adamax()
         model.compile(loss='mse', optimizer=adamax)
-    # model.summary()
-
         return model
 
 
 class Model:
-    def __init__(self, env, trained_model=None):
+    def __init__(self, env):
         self.env = env
-        self.model = create_nn(trained_model)  # one feedforward nn for all actions.
-    
+        self.model = create_nn()  # one feedforward nn for all actions.
+        self.memory = ringbuffer.RingBuffer(1000) # using a small buffer for retraining
+        self.gamma = 0.99
+
     def predict(self, s):
         return self.model.predict(s.reshape(1, 4*111), verbose=0)[0]
 
     def update(self, s, G):
-        self.model.fit(s.reshape(1, 4*111), np.array(G).reshape(-1, 11), nb_epoch=1, verbose=0)
+        self.model.fit(s, np.array(G).reshape(-1, 11), batch_size=B, epochs=1, use_multiprocessing=True, verbose=0)
 
     def sample_action(self, s, eps):
         qval = self.predict(s)
@@ -117,6 +115,27 @@ class Model:
         else:
             return np.argmax(qval), qval
 
+    def replay(self, batch_size):
+        batch = self.memory.sample(batch_size)
+        old_states = []
+        old_state_preds = []
+        for (old_state, argmax_qval, reward, next_state) in batch:
+            next_state_pred = self.predict(next_state)
+            max_next_pred = np.max(next_state_pred)
+            old_state_pred = self.predict(old_state)
+            target_q_value = reward + self.gamma * max_next_pred
+            y = old_state_pred[:]
+            y[argmax_qval] = target_q_value
+            old_states.append(old_state)
+            old_state_preds.append(y.reshape(1, 11))
+        old_states = np.reshape(old_states, (batch_size, 111*4))
+        old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
+        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0)
+
+    def save(self):
+        new_model = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500_retrain.h5")
+        self.model.model.save(new_model)
+        
 
 def convert_argmax_qval_to_env_action(output_value):
     # we reduce the action space to 15 values.  9 for steering, 6 for gaz/brake.
@@ -184,8 +203,6 @@ def play_one(env,model, eps, gamma, config,path=None,display=None):
     print("setting path")
     print("PATH IS: ", path)
     reset_video_recorder_filename(path,env)
-    # print(env.video_recorder.path)
-    #env.build_car(config)
     done = False
     full_reward_received = False
     totalreward = 0
@@ -196,18 +213,21 @@ def play_one(env,model, eps, gamma, config,path=None,display=None):
     state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
     stacked_state = np.array([state,state,state, state])
     while not done:
+        argmax_qval, qval = model.sample_action(stacked_state, eps)
+        prev_state = stacked_state
+        action = convert_argmax_qval_to_env_action(argmax_qval)
+        observation, reward, done, info = env.step(action)
         a, b, c = transform(observation)
         curr_state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1
         stacked_state = np.append(stacked_state[1:], [curr_state], axis=0) # appending the lastest frame, pop the oldest
-        argmax_qval, qval = model.sample_action(stacked_state, eps)
-        action = convert_argmax_qval_to_env_action(argmax_qval)
         # env.render()
-        observation, reward, done, info = env.step(action)
+        model.memory.append((prev_state, argmax_qval, reward, stacked_state))
         totalreward += reward
         totalfuelconsumed += info["fuel"]
         totalgrasstraveled += info["grass"]
         iters += 1
-
+        if iters % 20:
+            model.replay(32)
         if iters > 600:
             print("This episode is stuck")
             break
@@ -261,6 +281,8 @@ def init_buffer():
 
 def kill_buffer(display):
     display.sendstop()
+
+
 def run(config = {},session_id=None):
     env = gym.make('CarRacing-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=False, resume=True, video_callable= False, mode='evaluation')
@@ -281,6 +303,7 @@ def run(config = {},session_id=None):
         SIO.emit('evaluated_car',{"session_id":session_id,"car":{'config':config,'reward':totalreward,'fuel':fuel, 'grass':grass}})
     print("REWARD: ", totalreward, " FUEL: ", fuel, "GRASS: ",grass)
     return [totalreward, fuel, grass]
+
 def run_vid(config = {}):
     #testing os level display fix
     global orig
@@ -304,8 +327,8 @@ def run_vid(config = {}):
     display.sendstop()
     return [totalreward, fuel, grass]
 
-def run_unparsed(config = {}, filename=None,display=None,model_name=None):
-    print("running car with model: ", model_name)
+def run_unparsed(config = {}, filename=None,display=None):
+    print("running unparsed")
     tempdisplay = None
 #testing os level display fix
     #global orig
@@ -321,13 +344,16 @@ def run_unparsed(config = {}, filename=None,display=None,model_name=None):
     env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
     #this is to fix the problem with running keras in a separate thread and the session not getting killed
     K.clear_session()
-    model = Model(env, model_name)
+    model = Model(env)
     eps = 0.5/np.sqrt(1 + 900)
     gamma = 0.99
 
     # parsed_config = parse_config(config)
     parsed_config = config
-    totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config, filename)
+    run_per_TD = 3 # how many times to run training per test drive
+    for _ in range(run_per_TD):
+        totalreward, iters, fuel, grass = play_one(env, model, eps, gamma, parsed_config, filename)
+    model.save() # save new trained model 
     env.close()
     env = None
     model = None
