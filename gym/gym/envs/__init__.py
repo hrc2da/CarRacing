@@ -129,7 +129,13 @@ register(
 )
 
 register(
-    id='CarRacing-v1',
+    id='CarRacing-v1-train',
+    entry_point='gym.envs.box2d:DACarRacing',
+    max_episode_steps=500,
+    reward_threshold=900,
+)
+register(
+    id='CarRacing-v1-test',
     entry_point='gym.envs.box2d:DACarRacing',
     max_episode_steps=1000,
     reward_threshold=900,
