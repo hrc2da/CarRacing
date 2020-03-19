@@ -84,7 +84,7 @@ def create_nn(model_to_load):
         print("Loaded pretrained model " + model_to_load)
         init_weights = m.get_weights()
         return m, init_weights
-    except FileNotFoundError:
+    except:
         print("Creating new network")
         model = Sequential()
     # 4 frames vertically concatenated
@@ -98,7 +98,7 @@ def create_nn(model_to_load):
         model.compile(loss='mse', optimizer=adamax)
         model.summary()
         
-        return model
+        return model, None
 
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
@@ -304,5 +304,5 @@ class DQNAgent():
         self.env.close()
 
 if __name__ == "__main__":
-    trainer = DQNAgent(1000)
+    trainer = DQNAgent(1000, None)
     trainer.train()
