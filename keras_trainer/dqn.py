@@ -102,7 +102,7 @@ def create_nn(model_to_load):
 
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
-        env = gym.make('CarRacing-v1')
+        env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
         self.env = env
