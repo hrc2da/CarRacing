@@ -246,7 +246,10 @@ class DQNAgent():
         totalrewards = np.empty(self.num_episodes)
         for n in range(self.num_episodes):
             print("training ", str(n))
-            eps = 0.5/np.sqrt(n + 1000)
+            if not self.model_name:
+                eps = 0.5/np.sqrt(n + 1000)
+            else: # want to use a very small eps during retraining
+                eps = 0.001
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
