@@ -16,7 +16,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.utils import np_utils, plot_model
 from keras.models import load_model
 from keras import backend as K
-from keras import callbacks
+# from keras import callbacks
 from pprint import pprint
 import cv2
 # import tensorflow as tf
@@ -203,7 +203,7 @@ class DQNAgent():
             old_state_preds.append(y.reshape(1, 11))
         old_states = np.reshape(old_states, (batch_size, 111*4))
         old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
-        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0, callbacks=[tensorboard_callback])
+        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0)#, callbacks=[tensorboard_callback])
 
 
 
