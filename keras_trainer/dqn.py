@@ -16,10 +16,15 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.utils import np_utils, plot_model
 from keras.models import load_model
 from keras import backend as K
+from keras import callbacks
 from pprint import pprint
 import cv2
+# import tensorflow as tf
+import datetime
 import ringbuffer
 
+# logdir = "/home/zhilong/Documents/HRC/CarRacing/tf_logs/scalars/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+# tensorboard_callback = callbacks.TensorBoard(log_dir=logdir)
 def plot_running_avg(totalrewards):
   N = len(totalrewards)
   running_avg = np.empty(N)
@@ -27,7 +32,7 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "dqn_1000_running_avg.png")
+  fname = os.path.join(os.getcwd(), "dqn_10000_running_avg.png")
   plt.savefig(fname)
 
 
@@ -83,6 +88,17 @@ def create_nn(model_to_load):
         # K.set_value(m.optimizer.lr, 0.01) # set a higher LR for retraining
         print("Loaded pretrained model " + model_to_load)
         init_weights = m.get_weights()
+        print("duplicating network structure")
+        model = Sequential()
+        model.add(Dense(512, input_shape=(4*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
+        model.add(Activation('relu'))
+
+        model.add(Dense(11, kernel_initializer="lecun_uniform"))
+        model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
+
+        sgd = SGD(lr=0.001)
+        model.compile(loss='mse', optimizer=sgd)
+        model.set_weights(init_weights)
         return m, init_weights
     except:
         print("Creating new network")
@@ -187,7 +203,7 @@ class DQNAgent():
             old_state_preds.append(y.reshape(1, 11))
         old_states = np.reshape(old_states, (batch_size, 111*4))
         old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
-        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0)
+        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0, callbacks=[tensorboard_callback])
 
 
 
@@ -207,9 +223,6 @@ class DQNAgent():
         stacked_state = np.array([state,state,state, state])
         # print('state shape: ', stacked_state.shape)
         while not done:
-            # a, b, c = transform(observation)
-            # state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-            # print("STATE SHAPE: ", stacked_state.shape)
             argmax_qval, qval = self.sample_action(stacked_state, eps)
             prev_state = stacked_state
             action = self.convert_argmax_qval_to_env_action(argmax_qval)
@@ -236,10 +249,10 @@ class DQNAgent():
             if iters > 1500:
                 print("This episode is stuck")
                 break
-        if self.replay_freq==0:
-            print("replaying only at the end")
-            for _ in range(int(1000/32)):
-                self.replay(32)
+        # if self.replay_freq==0:
+        #     print("replaying only at the end")
+        #     for _ in range(int(1000/32)):
+        #         self.replay(32)
         return totalreward, iters
 
     def train(self, retrain=False):
@@ -253,50 +266,17 @@ class DQNAgent():
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
-            if n>0 and n%50==0 and not self.model_name:
+            if n>0 and n%500==0 and not self.model_name:
                 # save model
                 trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
         if self.model_name:
             print('saving: ', self.model_name)
             self.model.save(self.model_name)
-        # print(self.model)
-        # print("INITIAL WEIGHTS: ")
-        # pprint(self.init_weights)
-        # print("FINAL WEIGHTS: ")
-        # pprint(self.model.get_weights())
-        # print("DIFFERENCE")
-        # weight_diff = abs(np.array(self.model.get_weights())-np.array(self.init_weights))
-        # # pprint(weight_diff)
-        # print("PERCENTAGE CHANGE layer 1: ")
-        # layer1 = weight_diff[0]/self.init_weights[0] * 100
-        # # pprint(layer1)
-        # print("MAX of layer: ", np.max(layer1))
-        # print("mean of layer: ", np.mean(layer1))
-
-        # print("PERCENTAGE CHANGE layer 2: ")
-        # layer2 = weight_diff[1]/self.init_weights[1] * 100
-        # # pprint(layer2)
-        # print("MAX of layer: ", np.max(layer2))
-        # print("mean of layer: ", np.mean(layer2))
-
-        # print("PERCENTAGE CHANGE layer 3: ")
-        # layer3 = weight_diff[2]/self.init_weights[2] * 100
-        # # pprint(layer3)
-        # print("MAX of layer: ", np.max(layer3))
-        # print("mean of layer: ", np.mean(layer3))
-
-
-        # print("PERCENTAGE CHANGE layer 4: ")
-        # layer4 = weight_diff[3]/self.init_weights[3] * 100
-        # # pprint(layer4)
-        # print("MAX of layer: ", np.max(layer4))
-        # print("mean of layer: ", np.mean(layer4))
-
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "dqn_1000_rewards.png")
+            rp_name = os.path.join(os.getcwd(), "dqn_10000_rewards.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
@@ -304,5 +284,5 @@ class DQNAgent():
         self.env.close()
 
 if __name__ == "__main__":
-    trainer = DQNAgent(1000, None)
+    trainer = DQNAgent(10001, None, replay_freq=10)
     trainer.train()
