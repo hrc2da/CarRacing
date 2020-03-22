@@ -32,7 +32,7 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "dqn_10000_running_avg.png")
+  fname = os.path.join(os.getcwd(), "train_logs/dqn_10000_ra.png")
   plt.savefig(fname)
 
 
@@ -88,17 +88,6 @@ def create_nn(model_to_load):
         # K.set_value(m.optimizer.lr, 0.01) # set a higher LR for retraining
         print("Loaded pretrained model " + model_to_load)
         init_weights = m.get_weights()
-        print("duplicating network structure")
-        model = Sequential()
-        model.add(Dense(512, input_shape=(4*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
-        model.add(Activation('relu'))
-
-        model.add(Dense(11, kernel_initializer="lecun_uniform"))
-        model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
-
-        sgd = SGD(lr=0.001)
-        model.compile(loss='mse', optimizer=sgd)
-        model.set_weights(init_weights)
         return m, init_weights
     except:
         print("Creating new network")
@@ -114,7 +103,7 @@ def create_nn(model_to_load):
         model.compile(loss='mse', optimizer=adamax)
         model.summary()
         
-        return model, None
+        return model, model.get_weights()
 
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
@@ -125,6 +114,8 @@ class DQNAgent():
         self.gamma = 0.99
         self.model_name = model_name
         self.model, self.init_weights = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
+        self.target_model, _ = create_nn(model_name)
+        self.target_model.set_weights(self.init_weights)
         self.model.summary()
         self.replay_freq = replay_freq
         if not model_name:
@@ -135,8 +126,14 @@ class DQNAgent():
         self.num_episodes = num_episodes
 
     def predict(self, s):
-        # print("shape for pred is ", np.reshape(s, (4*111,)).shape)
         return self.model.predict(np.reshape(s, (1, 4*111)), verbose=0)[0]
+
+    def target_predict(self, s):
+        return self.target_model.predict(np.reshape(s, (1, 4*111)), verbose=0)[0]
+
+    def copy_weights(self):
+        model_weights = self.model.get_weights()
+        self.target_model.set_weights(model_weights)
 
     def update(self, s, G, B):
         self.model.fit(s, np.array(G).reshape(-1, 11), batch_size=B, epochs=1, use_multiprocessing=True, verbose=0)
@@ -193,7 +190,7 @@ class DQNAgent():
         old_states = []
         old_state_preds = []
         for (old_state, argmax_qval, reward, next_state) in batch:
-            next_state_pred = self.predict(next_state)
+            next_state_pred = self.target_predict(next_state)
             max_next_pred = np.max(next_state_pred)
             old_state_pred = self.predict(old_state)
             target_q_value = reward + self.gamma * max_next_pred
@@ -268,15 +265,17 @@ class DQNAgent():
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
             if n>0 and n%500==0 and not self.model_name:
                 # save model
-                trained_model = os.path.join(os.getcwd(),"dqn_trained_model_{}.h5".format(str(n)))
+                trained_model = os.path.join(os.getcwd(),"train_logs/dqn_trained_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
+            self.copy_weights() # copy weights after every episode
+
         if self.model_name:
             print('saving: ', self.model_name)
             self.model.save(self.model_name)
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "dqn_10000_rewards.png")
+            rp_name = os.path.join(os.getcwd(), "train_logs/dqn_10000_rewards.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
