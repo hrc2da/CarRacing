@@ -29,7 +29,7 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_ra.png")
+  fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_ra.png")
   plt.savefig(fname)
 
 
@@ -74,7 +74,7 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn(model_to_load):
+def create_nn(model_to_load, stack_len):
     try:
         m = load_model(model_to_load)
         print("Loaded pretrained model " + model_to_load)
@@ -83,7 +83,7 @@ def create_nn(model_to_load):
     except:
         print("Creating new network")
         model = Sequential()
-        model.add(Dense(512, input_shape=(4*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
+        model.add(Dense(512, input_shape=(stack_len*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
         model.add(Activation('relu'))
 
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
@@ -103,9 +103,10 @@ class DQNAgent():
         self.env = env
         self.gamma = 0.99
         self.K = 10
+        self.stack_len = 10  # number of continuous frames to stack
         self.model_name = model_name
-        self.model, self.init_weights = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
-        self.target_model, _ = create_nn(model_name)
+        self.model, self.init_weights = create_nn(model_name, self.stack_len)  # consecutive steps, 111-element vector for each state
+        self.target_model, _ = create_nn(model_name, self.stack_len)
         self.past_weights = deque(maxlen=self.K)
         self.past_weights.append(self.init_weights)
         self.target_model.set_weights(self.init_weights)
@@ -127,10 +128,10 @@ class DQNAgent():
         return total_w/len(self.past_weights)
 
     def predict(self, s):
-        return self.model.predict(np.reshape(s, (1, 4*111)), verbose=0)[0]
+        return self.model.predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
 
     def target_predict(self, s):
-        return self.target_model.predict(np.reshape(s, (1, 4*111)), verbose=0)[0]
+        return self.target_model.predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
 
     def add_weights(self):
         model_weights = self.model.get_weights()
@@ -201,7 +202,7 @@ class DQNAgent():
             y[argmax_qval] = target_q_value
             old_states.append(old_state)
             old_state_preds.append(y.reshape(1, 11))
-        old_states = np.reshape(old_states, (batch_size, 111*4))
+        old_states = np.reshape(old_states, (batch_size, 111*self.stack_len))
         old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
         self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0)
 
@@ -220,8 +221,7 @@ class DQNAgent():
         iters = 0
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        stacked_state = np.array([state,state,state, state])
-        # print('state shape: ', stacked_state.shape)
+        stacked_state = np.array([state]*self.stack_len)
         while not done:
             argmax_qval, qval = self.sample_action(stacked_state, eps)
             prev_state = stacked_state
@@ -250,10 +250,6 @@ class DQNAgent():
             if iters > 1500:
                 print("This episode is stuck")
                 break
-        # if self.replay_freq==0:
-        #     print("replaying only at the end")
-        #     for _ in range(int(1000/32)):
-        #         self.replay(32)
         return totalreward, iters
 
     def train(self, retrain=False):
@@ -269,7 +265,7 @@ class DQNAgent():
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
             if n>0 and n%500==0 and not self.model_name:
                 # save model
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_{}.h5".format(str(n)))
+                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_10_seq_model_{}.h5".format(str(n)))
                 self.model.model.save(trained_model)
 
         if self.model_name:
@@ -278,7 +274,7 @@ class DQNAgent():
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards.png")
+            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_rewards.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
@@ -286,5 +282,5 @@ class DQNAgent():
         self.env.close()
 
 if __name__ == "__main__":
-    trainer = DQNAgent(5001, None, replay_freq=10)
+    trainer = DQNAgent(2001, None, replay_freq=10)
     trainer.train()
