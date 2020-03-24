@@ -286,5 +286,5 @@ class DQNAgent():
         self.env.close()
 
 if __name__ == "__main__":
-    trainer = DQNAgent(10001, None, replay_freq=10)
+    trainer = DQNAgent(5001, None, replay_freq=10)
     trainer.train()
