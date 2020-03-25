@@ -12,8 +12,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.utils import np_utils, plot_model
 from keras.models import load_model
 from keras import backend as K
 from pprint import pprint
@@ -87,11 +85,10 @@ def create_nn(model_to_load, stack_len):
         model.add(Activation('relu'))
 
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
-        model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
+        # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
         adamax = Adamax() #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
-        model.summary()
         
         return model, model.get_weights()
 
@@ -100,16 +97,18 @@ class DQNAgent():
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
+        self.curr_pointer = 0
         self.env = env
         self.gamma = 0.99
         self.K = 10
-        self.stack_len = 10  # number of continuous frames to stack
+        self.stack_len = 4  # number of continuous frames to stack
         self.model_name = model_name
         self.model, self.init_weights = create_nn(model_name, self.stack_len)  # consecutive steps, 111-element vector for each state
-        self.target_model, _ = create_nn(model_name, self.stack_len)
-        self.past_weights = deque(maxlen=self.K)
-        self.past_weights.append(self.init_weights)
-        self.target_model.set_weights(self.init_weights)
+        self.target_models = []
+        for _ in range(self.K):
+            target_model, _ = create_nn(model_name, self.stack_len)
+            target_model.set_weights(self.init_weights)
+            self.target_models.append(target_model)
         self.model.summary()
         self.replay_freq = replay_freq
         if not model_name:
@@ -119,23 +118,20 @@ class DQNAgent():
         self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         self.num_episodes = num_episodes
 
-    def get_avg_weights(self):
-        total_w = np.array(self.past_weights[0])
-        for w in self.past_weights:
-            this_w = np.array(w)
-            if this_w!=self.past_weights[0]:
-                total_w += this_w
-        return total_w/len(self.past_weights)
-
     def predict(self, s):
         return self.model.predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
 
     def target_predict(self, s):
-        return self.target_model.predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
+        total_pred = self.target_models[0].predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
+        for i in range(1, self.K):
+            pred = self.target_models[i].predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
+            total_pred += pred
+        next_pred = total_pred/self.K
+        return next_pred
 
-    def add_weights(self):
+    def update_targets(self):
         model_weights = self.model.get_weights()
-        self.past_weights.append(model_weights)
+        self.target_models[self.curr_pointer%self.K].set_weights(model_weights)
 
     def update(self, s, G, B):
         self.model.fit(s, np.array(G).reshape(-1, 11), batch_size=B, epochs=1, use_multiprocessing=True, verbose=0)
@@ -189,12 +185,7 @@ class DQNAgent():
         old_states = []
         old_state_preds = []
         for (old_state, argmax_qval, reward, next_state) in batch:
-            self.target_model.set_weights(self.past_weights[0])
-            total_next_pred = self.target_predict(next_state)
-            for i in range(1, len(self.past_weights)):
-                self.target_model.set_weights(self.past_weights[i])
-                total_next_pred += self.target_predict(next_state)
-            next_state_pred = total_next_pred/len(self.past_weights)
+            next_state_pred = self.target_predict(next_state)
             max_next_pred = np.max(next_state_pred)
             old_state_pred = self.predict(old_state)
             target_q_value = reward + self.gamma * max_next_pred
@@ -204,7 +195,7 @@ class DQNAgent():
             old_state_preds.append(y.reshape(1, 11))
         old_states = np.reshape(old_states, (batch_size, 111*self.stack_len))
         old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
-        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0)
+        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0, workers=8,use_multiprocessing=True)
 
 
 
@@ -235,7 +226,8 @@ class DQNAgent():
             # add to memory
             self.memory.append((prev_state, argmax_qval, reward, stacked_state))
             if iters%100==0:
-                self.add_weights()
+                self.curr_pointer += 1
+                self.update_targets()
             # replay batch from memory every 20 steps
             if self.replay_freq!=0:
                 if iters % self.replay_freq==0 and iters>10:

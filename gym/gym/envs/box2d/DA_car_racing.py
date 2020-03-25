@@ -1,7 +1,7 @@
 import sys, math
 import numpy as np
 import os
-import dill as pkl
+import pickle as pkl
 
 import Box2D
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener)
