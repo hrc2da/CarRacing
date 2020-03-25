@@ -1,1 +1,0 @@
-{"stats": "openaigym.episode_batch.21.4544.stats.json", "videos": [["openaigym.video.21.4544.video000000.mp4", "openaigym.video.21.4544.video000000.meta.json"], ["ec6ed97765a24af694ff3df74817b7db.mp4", "ec6ed97765a24af694ff3df74817b7db.meta.json"]], "env_info": {"gym_version": "0.10.5", "env_id": "CarRacing-v1"}}
