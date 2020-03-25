@@ -8,17 +8,15 @@ from gym import wrappers
 from datetime import datetime
 import random
 from sklearn.preprocessing import StandardScaler
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Embedding
-from keras.optimizers import SGD, RMSprop, Adam, Adamax
-from keras.models import load_model
-from keras import backend as K
+import torch
+import torch.nn as nn
 from pprint import pprint
 import cv2
 import datetime
 from collections import deque
 import ringbuffer
+
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def plot_running_avg(totalrewards):
   N = len(totalrewards)
@@ -27,7 +25,7 @@ def plot_running_avg(totalrewards):
     running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
   plt.plot(running_avg)
   plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_ra.png")
+  fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_ra.png")
   plt.savefig(fname)
 
 
@@ -72,44 +70,49 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn(model_to_load, stack_len):
+
+def create_nn(model_to_load):
     try:
-        m = load_model(model_to_load)
+        model = torch.nn.Sequential(
+            torch.nn.Linear(input_shape, h1_shape),
+            torch.nn.ReLU(),
+            torch.nn.Linear(h1_shape, output_shape)
+        )
+        model.load_state_dict(torch.load(model_to_load))
         print("Loaded pretrained model " + model_to_load)
-        init_weights = m.get_weights()
+        init_weights = m.state_dict()
         return m, init_weights
     except:
         print("Creating new network")
-        model = Sequential()
-        model.add(Dense(512, input_shape=(stack_len*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
-        model.add(Activation('relu'))
-
-        model.add(Dense(11, kernel_initializer="lecun_uniform"))
-        # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
-
-        adamax = Adamax() #Adamax(lr=0.001)
-        model.compile(loss='mse', optimizer=adamax)
+        input_shape = 4*111
+        h1_shape = 512
+        output_shape = 11
         
-        return model, model.get_weights()
+        model = torch.nn.Sequential(
+            torch.nn.Linear(input_shape, h1_shape),
+            torch.nn.ReLU(),
+            torch.nn.Linear(h1_shape, output_shape)
+        )
+        loss_fn = torch.nn.MSELoss(reduction='sum')
+        optimizer = torch.optim.Adamax(model.parameters(), lr=1e-4)
+        
+        return model.to(device), model.state_dict(), loss_fn, optimizer
 
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
-        self.curr_pointer = 0
         self.env = env
         self.gamma = 0.99
         self.K = 10
-        self.stack_len = 4  # number of continuous frames to stack
         self.model_name = model_name
-        self.model, self.init_weights = create_nn(model_name, self.stack_len)  # consecutive steps, 111-element vector for each state
-        self.target_models = []
-        for _ in range(self.K):
-            target_model, _ = create_nn(model_name, self.stack_len)
-            target_model.set_weights(self.init_weights)
-            self.target_models.append(target_model)
-        self.model.summary()
+        self.model, self.init_weights, self.loss_fn, self.optimizer = create_nn(model_name)  # 4 consecutive steps, 111-element vector for each state
+        self.target_model, _, _, _ = create_nn(model_name)
+        self.past_weights = deque(maxlen=self.K)
+        self.past_weights.append(self.init_weights)
+        self.target_model.load_state_dict(self.init_weights)
+        
         self.replay_freq = replay_freq
         if not model_name:
             MEMORY_SIZE = 10000
@@ -118,31 +121,34 @@ class DQNAgent():
         self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         self.num_episodes = num_episodes
 
+    def get_avg_weights(self):
+        total_w = np.array(self.past_weights[0])
+        for w in self.past_weights:
+            this_w = np.array(w)
+            if this_w!=self.past_weights[0]:
+                total_w += this_w
+        return total_w/len(self.past_weights)
+
     def predict(self, s):
-        return self.model.predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
+        return self.model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
 
     def target_predict(self, s):
-        total_pred = self.target_models[0].predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
-        for i in range(1, self.K):
-            pred = self.target_models[i].predict(np.reshape(s, (1, self.stack_len*111)), verbose=0)[0]
-            total_pred += pred
-        next_pred = total_pred/self.K
-        return next_pred
+        return self.target_model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
 
-    def update_targets(self):
-        model_weights = self.model.get_weights()
-        self.target_models[self.curr_pointer%self.K].set_weights(model_weights)
+    def add_weights(self):
+        model_weights = self.model.state_dict()
+        self.past_weights.append(model_weights)
 
-    def update(self, s, G, B):
-        self.model.fit(s, np.array(G).reshape(-1, 11), batch_size=B, epochs=1, use_multiprocessing=True, verbose=0)
+    # def update(self, s, G, B):
+    #     self.model.fit(s, np.array(G).reshape(-1, 11), batch_size=B, epochs=1, use_multiprocessing=True, verbose=0)
 
     def sample_action(self, s, eps):
         # print('THE SHAPE FOR PREDICTION: ', s.shape)
-        qval = self.predict(s)
+        qvals = self.predict(s)
         if np.random.random() < eps:
-            return random.randint(0, 10), qval
+            return torch.randint(low=0,high=11,size=(1,)), qvals #pytorch randint upper bound is one above sample range
         else:
-            return np.argmax(qval), qval
+            return torch.argmax(qvals), qvals
 
     def convert_argmax_qval_to_env_action(self, output_value):
         # to reduce the action space, gaz and brake cannot be applied at the same time.
@@ -182,20 +188,31 @@ class DQNAgent():
 
     def replay(self, batch_size):
         batch = self.memory.sample(batch_size)
-        old_states = []
-        old_state_preds = []
+        targets = None
+        predictions = None
         for (old_state, argmax_qval, reward, next_state) in batch:
-            next_state_pred = self.target_predict(next_state)
-            max_next_pred = np.max(next_state_pred)
+            self.target_model.load_state_dict(self.past_weights[0]) #fix the creation of this
+            with torch.no_grad(): # I think we can turn off gradient tracking since we are not back-prop'ing these
+                total_next_pred = self.target_predict(next_state) # returns tensor
+                for i in range(1, len(self.past_weights)):
+                    self.target_model.load_state_dict(self.past_weights[i])
+                    total_next_pred += self.target_predict(next_state) # summing tensors
+                next_state_pred = total_next_pred/len(self.past_weights)
+                max_next_pred = torch.max(next_state_pred)
             old_state_pred = self.predict(old_state)
             target_q_value = reward + self.gamma * max_next_pred
-            y = old_state_pred[:]
-            y[argmax_qval] = target_q_value
-            old_states.append(old_state)
-            old_state_preds.append(y.reshape(1, 11))
-        old_states = np.reshape(old_states, (batch_size, 111*self.stack_len))
-        old_state_preds = np.array(old_state_preds).reshape(batch_size, 11)
-        self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0, workers=10, use_multiprocessing=True)
+            target = old_state_pred[:].detach()
+            target[0, argmax_qval] = target_q_value #in-place is ok b/c no gradient needed (I think)
+            if targets is None:
+                targets = target
+                predictions = old_state_pred
+            else:
+                torch.cat((targets,target))
+                torch.cat((predictions,old_state_pred))
+        loss = self.loss_fn(predictions,targets)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
 
 
@@ -212,11 +229,12 @@ class DQNAgent():
         iters = 0
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        stacked_state = np.array([state]*self.stack_len)
+        stacked_state = np.array([state,state,state, state])
+        # print('state shape: ', stacked_state.shape)
         while not done:
             argmax_qval, qval = self.sample_action(stacked_state, eps)
             prev_state = stacked_state
-            action = self.convert_argmax_qval_to_env_action(argmax_qval)
+            action = self.convert_argmax_qval_to_env_action(argmax_qval.detach().cpu().item())
             observation, reward, done, info = self.env.step(action)
 
             a, b, c = transform(observation)        
@@ -224,10 +242,9 @@ class DQNAgent():
             stacked_state = np.append(stacked_state[1:], [curr_state], axis=0) # appending the lastest frame, pop the oldest
             # print('state shape: ', stacked_state.shape)
             # add to memory
-            self.memory.append((prev_state, argmax_qval, reward, stacked_state))
+            self.memory.append((prev_state, argmax_qval, reward, stacked_state)) # these are all np arrays, except for argmax_qval, which is a tensor
             if iters%100==0:
-                self.curr_pointer += 1
-                self.update_targets()
+                self.add_weights()
             # replay batch from memory every 20 steps
             if self.replay_freq!=0:
                 if iters % self.replay_freq==0 and iters>10:
@@ -242,6 +259,10 @@ class DQNAgent():
             if iters > 1500:
                 print("This episode is stuck")
                 break
+        # if self.replay_freq==0:
+        #     print("replaying only at the end")
+        #     for _ in range(int(1000/32)):
+        #         self.replay(32)
         return totalreward, iters
 
     def train(self, retrain=False):
@@ -257,16 +278,16 @@ class DQNAgent():
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
             if n>0 and n%500==0 and not self.model_name:
                 # save model
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_10_seq_model_{}.h5".format(str(n)))
-                self.model.model.save(trained_model)
+                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_torch_{}.h5".format(str(n)))
+                torch.save(self.model.state_dict(), trained_model)
 
         if self.model_name:
             print('saving: ', self.model_name)
-            self.model.save(self.model_name)
+            torch.save(self.model.state_dict(), self.model_name)
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_rewards.png")
+            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
@@ -274,5 +295,5 @@ class DQNAgent():
         self.env.close()
 
 if __name__ == "__main__":
-    trainer = DQNAgent(1001, None, replay_freq=10)
+    trainer = DQNAgent(5001, None, replay_freq=10)
     trainer.train()
