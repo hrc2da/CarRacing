@@ -105,6 +105,7 @@ def create_nn(model_to_load, stack_len):
 
         adamax = Adamax() #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
+        model.save(model_to_load)
         
         return model, model.get_weights()
 
@@ -226,6 +227,7 @@ class DQNAgent():
         else: 
             observation = self.env.reset()
         if video_path is not None:
+            print("Setting video path to: {}".format(video_path))
             reset_video_recorder_filename(video_path,self.env)
         done = False
         full_reward_received = False
@@ -289,7 +291,7 @@ class DQNAgent():
             self.model.save(self.model_name)
             
             plt.plot(totalrewards)
-            model_name_no_extension = os.path.splitext(self.model_name)
+            model_name_no_extension = os.path.splitext(self.model_name)[0]
             rp_name = os.path.join(os.getcwd(), "{}.png".format(model_name_no_extension))
             plt.title("Rewards")
             plt.savefig(rp_name)
