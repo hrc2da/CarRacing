@@ -3,6 +3,8 @@ import time
 import os
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from gym import wrappers
 from gym.wrappers.monitoring import stats_recorder, video_recorder
@@ -19,9 +21,11 @@ from pprint import pprint
 import cv2
 import datetime
 from collections import deque
-import ringbuffer
+# import ringbuffer
 import pickle as pkl
 import json
+from keras_trainer import ringbuffer
+
 
 def plot_running_avg(totalrewards):
   N = len(totalrewards)
@@ -114,7 +118,6 @@ class DQNAgent():
         K.clear_session()
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
-        #env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
         self.curr_pointer = 0
         self.env = env
@@ -274,14 +277,14 @@ class DQNAgent():
             if not self.model_name:
                 eps = 0.01 #0.5/np.sqrt(n + 100)
             else: # want to use a very small eps during retraining
-                eps = 0.01
+                eps = 0.1
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
             if n>=0 and n%50==0 and not self.model_name:
                 # save model (assuming this is NOT the flask app, which WILL pass a model name)
                 trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_{}.h5".format(str(n)))
-                with open("train_logs/avg_dqn_total_rewards_{}.pkl",'wb+'.format(str(n))) as outfile:
+                with open("train_logs/avg_dqn_total_rewards_{}.pkl".format(str(n)),'wb+') as outfile:
                     pkl.dump(totalrewards, outfile)
                 self.model.save(trained_model)
 
