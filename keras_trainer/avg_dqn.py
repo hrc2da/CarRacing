@@ -289,14 +289,15 @@ class DQNAgent():
             self.model.save(self.model_name)
             
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "flask_model/{}.png".format(self.model_name))
+            model_name_no_extension = os.path.splitext(self.model_name)
+            rp_name = os.path.join(os.getcwd(), "{}.png".format(model_name_no_extension))
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
             plot_running_avg(totalrewards)
-            with open("flask_model/{}_rewards_flask.pkl".format(self.model_name),'wb+') as outfile:
+            with open("{}_rewards_flask.pkl".format(model_name_no_extension),'wb+') as outfile:
                 pkl.dump(totalrewards, outfile)
-            with open("flask_model/{}_car_config.json".format(self.model_name),'w+') as outfile:
+            with open("{}_car_config.json".format(model_name_no_extension),'w+') as outfile:
                 json.dump(self.carConfig, outfile)
 
 
@@ -307,7 +308,7 @@ class DQNAgent():
             plt.savefig(rp_name)
             plt.close()
             plot_running_avg(totalrewards)
-            with open("train_logs/avg_dqn_total_rewards_final.pkl",'wb+') as outfile:
+            with open(os.path.join(os.getcwd(), "train_logs/avg_dqn_total_rewards_final.pkl",'wb+')) as outfile:
                 pkl.dump(totalreward, outfile)
         self.env.close()
 

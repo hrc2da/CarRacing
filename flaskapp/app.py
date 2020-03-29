@@ -52,7 +52,7 @@ def testdrive(train=False):
     #t.join()
     # want to train it for a few episodes first
     #trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_trained_model_500.h5")
-    trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_4_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
+    trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
     
     num_episodes -= 1 # train for n-1 and then call play_once to get the video
     driver = DQNAgent(num_episodes, trained_model_name, car_config, 20)
