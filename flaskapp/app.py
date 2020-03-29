@@ -5,7 +5,7 @@ import os,sys
 # sys.path.append('/share/sandbox/')
 sys.path.append('/home/hrc2/hrcd/cars/carracing')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
-sys.path.append('/home/dev/scratch/cars/carracing')
+sys.path.append('/home/dev/scratch/cars/carracing_clean')
 #from carracing.agents.nsgaii import nsgaii_agent
 from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
@@ -40,8 +40,10 @@ def traindriver():
 
 @app.route("/testdrive", methods=['POST'])
 def testdrive(train=False):
-    carConfig = request.get_json()
-    print("TEST DRIVING")
+    request_params = request.get_json()
+    car_config = request_params['config']
+    num_episodes = int(request_params['numEpisodes'])
+    print("TEST DRIVING for {} episodes".format(num_episodes))
     #create a unique filename.mp4
     filename = uuid.uuid4().hex+'.mp4'
     #run the car with it
@@ -49,17 +51,45 @@ def testdrive(train=False):
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/avg_dqn_trained_model_500_retrain.h5")
-    if train == True:        
-        trainer = DQNAgent(10, trained_model_name, carConfig, 0)
-        trainer.train()
-    with ThreadPoolExecutor(max_workers=4) as e:
-        simulation = e.submit(run_unparsed, carConfig, filename, display, trained_model_name) #pass true if display is enabled
+    #trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_trained_model_500.h5")
+    trained_model_namfore = os.path.join(os.getcwd(),"flask_model/avg_dqn_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
+    
+    num_episodes -= 1 # train for n-1 and then call play_once to get the video
+    driver = DQNAgent(num_episodes, trained_model_name, car_config, 20)
+    if num_episodes > 0:
+        training = True       
+        result = driver.train()
+    # with ThreadPoolExecutor(max_workers=4) as e:
+    #     simulation = e.submit(run_unparsed, car_config, filename, display, trained_model_name) #pass true if display is enabled
     #let's try this for now, but blocking isn't going to work if >1 user.
     #potential solution: redis+celery (blog.miguelgrinberg.com/post/using-celery-with-flask
-        return jsonify({"video":filename, "result":simulation.result()})
+    else:
+        training = False
+    result = driver.play_one(train=training,video_path=filename,eps=0)
+    driver.env.close()
+    return jsonify({"video":filename, "result": result})
 #    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
 #    return jsonify({"video":filename,"result":result})
+#     carConfig = request.get_json()
+#     print("TEST DRIVING")
+#     #create a unique filename.mp4
+#     filename = uuid.uuid4().hex+'.mp4'
+#     #run the car with it
+#     #t = threading.Thread(target=run_unparsed, args=(carConfig,os.path.join('../static',filename))) #this is a hack to write outside the monitor-files dir
+#     #t.start()
+#     #t.join()
+#     # want to train it for a few episodes first
+#     trained_model_name = os.path.join(os.getcwd(),"flask_model/bigdqn_trained_model_10000.h5")
+#     if train == True:        
+#         trainer = DQNAgent(10, trained_model_name, carConfig, 0)
+#         trainer.train()
+#     with ThreadPoolExecutor(max_workers=4) as e:
+#         simulation = e.submit(run_unparsed, carConfig, filename, display, trained_model_name) #pass true if display is enabled
+#     #let's try this for now, but blocking isn't going to work if >1 user.
+#     #potential solution: redis+celery (blog.miguelgrinberg.com/post/using-celery-with-flask
+#         return jsonify({"video":filename, "result":simulation.result()})
+# #    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
+# #    return jsonify({"video":filename,"result":result})
 @socketio.on('connect')
 def handle_connect():
     sess = str(time.time())

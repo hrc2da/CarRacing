@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from gym import wrappers
+from gym.wrappers.monitoring import stats_recorder, video_recorder
 from datetime import datetime
 import random
 from sklearn.preprocessing import StandardScaler
@@ -19,6 +20,8 @@ import cv2
 import datetime
 from collections import deque
 import ringbuffer
+import pickle as pkl
+import json
 
 def plot_running_avg(totalrewards):
   N = len(totalrewards)
@@ -29,6 +32,18 @@ def plot_running_avg(totalrewards):
   plt.title("Running Average")
   fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_ra.png")
   plt.savefig(fname)
+
+def reset_video_recorder_filename(filename,env):
+    if env.video_recorder:
+        env._close_video_recorder()
+    print("FILENAME IN VR:{}/{} ".format(env.directory, filename))
+    env.video_recorder = video_recorder.VideoRecorder(
+                env=env,
+                path=os.path.join(env.directory,filename),
+                metadata={'episode_id': env.episode_id},
+                enabled=env._video_enabled(),
+            )
+    env.video_recorder.capture_frame()
 
 
 def transform(s):
@@ -78,7 +93,8 @@ def create_nn(model_to_load, stack_len):
         print("Loaded pretrained model " + model_to_load)
         init_weights = m.get_weights()
         return m, init_weights
-    except:
+    except Exception as e:
+        print(e)
         print("Creating new network")
         model = Sequential()
         model.add(Dense(512, input_shape=(stack_len*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
@@ -89,13 +105,16 @@ def create_nn(model_to_load, stack_len):
 
         adamax = Adamax(lr=0.01) #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
+        model.save(model_to_load)
         
         return model, model.get_weights()
 
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
+        K.clear_session()
         env = gym.make('CarRacingTrain-v1')
-        env = wrappers.Monitor(env, 'monitor-folder', force=True)
+        env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
+        #env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
         self.curr_pointer = 0
         self.env = env
@@ -103,6 +122,7 @@ class DQNAgent():
         self.K = 10
         self.stack_len = 4  # number of continuous frames to stack
         self.model_name = model_name
+        #model_name = "flask_model/avg_dqn_4_seq_model_every50_2_100.h5"
         self.model, self.init_weights = create_nn(model_name, self.stack_len)  # consecutive steps, 111-element vector for each state
         self.target_models = []
         for _ in range(self.K):
@@ -199,13 +219,16 @@ class DQNAgent():
 
 
 
-    def play_one(self, eps):
+    def play_one(self, eps,train=True,video_path=None):
         if self.carConfig:
             print("TRAINING WITH CAR CONFIG: ")
             print(self.carConfig)
             observation = self.env.reset(self.carConfig)
         else: 
             observation = self.env.reset()
+        if video_path is not None:
+            print("Setting video path to: {}".format(video_path))
+            reset_video_recorder_filename(video_path,self.env)
         done = False
         full_reward_received = False
         totalreward = 0
@@ -229,7 +252,7 @@ class DQNAgent():
                 self.curr_pointer += 1
                 self.update_targets()
             # replay batch from memory every 20 steps
-            if self.replay_freq!=0:
+            if self.replay_freq!=0 and train==True:
                 if iters % self.replay_freq==0 and iters>10:
                     try:
                         self.replay(32)
@@ -249,28 +272,46 @@ class DQNAgent():
         for n in range(self.num_episodes):
             print("training ", str(n))
             if not self.model_name:
-                eps = 0.5/np.sqrt(n + 100)
+                eps = 0.01 #0.5/np.sqrt(n + 100)
             else: # want to use a very small eps during retraining
-                eps = 0.1
+                eps = 0.01
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
-            if n>0 and n%500==0 and not self.model_name:
-                # save model
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_10_seq_model_{}.h5".format(str(n)))
-                self.model.model.save(trained_model)
+            if n>=0 and n%50==0 and not self.model_name:
+                # save model (assuming this is NOT the flask app, which WILL pass a model name)
+                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_{}.h5".format(str(n)))
+                with open("train_logs/avg_dqn_total_rewards_{}.pkl",'wb+'.format(str(n))) as outfile:
+                    pkl.dump(totalrewards, outfile)
+                self.model.save(trained_model)
 
         if self.model_name:
+            # we assume that this IS the flask app; if you are trying to retrain FROM an h5, put it in the flask_model directory for now
             print('saving: ', self.model_name)
             self.model.save(self.model_name)
-
-        if not self.model_name:
+            
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_rewards.png")
+            model_name_no_extension = os.path.splitext(self.model_name)[0]
+            rp_name = os.path.join(os.getcwd(), "{}.png".format(model_name_no_extension))
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
             plot_running_avg(totalrewards)
+            with open("{}_rewards_flask.pkl".format(model_name_no_extension),'wb+') as outfile:
+                pkl.dump(totalrewards, outfile)
+            with open("{}_car_config.json".format(model_name_no_extension),'w+') as outfile:
+                json.dump(self.carConfig, outfile)
+
+
+        if not self.model_name:
+            plt.plot(totalrewards)
+            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn.png")
+            plt.title("Rewards")
+            plt.savefig(rp_name)
+            plt.close()
+            plot_running_avg(totalrewards)
+            with open(os.path.join(os.getcwd(), "train_logs/avg_dqn_total_rewards_final.pkl",'wb+')) as outfile:
+                pkl.dump(totalreward, outfile)
         self.env.close()
 
 if __name__ == "__main__":
