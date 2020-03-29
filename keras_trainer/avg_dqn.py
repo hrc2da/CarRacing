@@ -87,7 +87,7 @@ def create_nn(model_to_load, stack_len):
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
         # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-        adamax = Adamax() #Adamax(lr=0.001)
+        adamax = Adamax(lr=0.01) #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
         
         return model, model.get_weights()

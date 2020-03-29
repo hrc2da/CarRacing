@@ -20,7 +20,6 @@ from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 from keras import backend as K

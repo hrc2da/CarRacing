@@ -11,7 +11,7 @@ from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
 # from keras_trainer.run_car import run_unparsed
 from keras_trainer.run_dqn_car import run_unparsed
-from keras_trainer.dqn import DQNAgent
+from keras_trainer.avg_dqn import DQNAgent
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -49,7 +49,7 @@ def testdrive(train=False):
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/dqn_train_car_500_retrain.h5")
+    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/avg_dqn_trained_model_500_retrain.h5")
     if train == True:        
         trainer = DQNAgent(10, trained_model_name, carConfig, 0)
         trainer.train()
