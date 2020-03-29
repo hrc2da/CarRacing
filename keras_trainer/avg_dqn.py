@@ -281,7 +281,7 @@ class DQNAgent():
             if n>=0 and n%50==0 and not self.model_name:
                 # save model (assuming this is NOT the flask app, which WILL pass a model name)
                 trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_{}.h5".format(str(n)))
-                with open("train_logs/avg_dqn_total_rewards_{}.pkl",'wb+'.format(str(n))) as outfile:
+                with open("train_logs/avg_dqn_total_rewards_{}.pkl".format(str(n)),'wb+') as outfile:
                     pkl.dump(totalrewards, outfile)
                 self.model.save(trained_model)
 

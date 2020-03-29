@@ -20,7 +20,7 @@ from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.layers import Merge
+# from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 from keras import backend as K
@@ -317,7 +317,7 @@ def run_unparsed(config = {}, filename=None,display=None,model_name=None):
         tempdisplay.start()
         #tempdisplay = Xvfb(width=1400,height=900)
         #tempdisplay.start()
-    env = gym.make('CarRacing-v1')
+    env = gym.make('CarRacingTest-v1')
     env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
     #this is to fix the problem with running keras in a separate thread and the session not getting killed
     K.clear_session()
