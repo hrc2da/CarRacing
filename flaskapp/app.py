@@ -7,10 +7,10 @@ sys.path.append('/home/hrc2/hrcd/cars/carracing')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 sys.path.append('/home/dev/scratch/cars/carracing_clean')
 #from carracing.agents.nsgaii import nsgaii_agent
-from agents.nsgaii import nsgaii_agent
+# from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
 # from keras_trainer.run_car import run_unparsed
-from keras_trainer.run_dqn_car import run_unparsed
+# from keras_trainer.run_dqn_car import run_unparsed
 from keras_trainer.avg_dqn import DQNAgent
 import time
 import threading
@@ -51,14 +51,14 @@ def testdrive(train=False):
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    #trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_trained_model_500.h5")
-    trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
+    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/avg_dqn_trained_model_5000_retrain.h5")
+    # trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
     
     num_episodes -= 1 # train for n-1 and then call play_once to get the video
     driver = DQNAgent(num_episodes, trained_model_name, car_config, 20)
     if num_episodes > 0:
         training = True       
-        result = driver.train()
+        driver.train()
     # with ThreadPoolExecutor(max_workers=4) as e:
     #     simulation = e.submit(run_unparsed, car_config, filename, display, trained_model_name) #pass true if display is enabled
     #let's try this for now, but blocking isn't going to work if >1 user.
@@ -66,6 +66,7 @@ def testdrive(train=False):
     else:
         training = False
     result = driver.play_one(train=training,video_path=filename,eps=0)
+    driver.memory.save(os.path.join(os.getcwd(),"dumped_memory.pkl"))
     driver.env.close()
     return jsonify({"video":filename, "result": result})
 #    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
@@ -95,11 +96,11 @@ def handle_connect():
     sess = str(time.time())
     emit('session_id', sess)
 
-@socketio.on('start_ga')
-def start_ga(sess):
-    agent = nsgaii_agent(sess)
-    t = threading.Thread(target=agent.run)
-    # t.start()
+# @socketio.on('start_ga')
+# def start_ga(sess):
+#     agent = nsgaii_agent(sess)
+#     t = threading.Thread(target=agent.run)
+#     # t.start()
 
 
 @socketio.on('evaluated_car')

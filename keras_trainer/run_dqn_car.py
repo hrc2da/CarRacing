@@ -20,7 +20,6 @@ from keras.layers import Embedding
 from keras.optimizers import SGD, RMSprop, Adam, Adamax
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-# from keras.layers import Merge
 from keras.utils import np_utils
 from keras.models import load_model
 from keras import backend as K
@@ -262,7 +261,7 @@ def init_buffer():
 def kill_buffer(display):
     display.sendstop()
 def run(config = {},session_id=None):
-    env = gym.make('CarRacing-v1')
+    env = gym.make('CarRacingTest-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=False, resume=True, video_callable= False, mode='evaluation')
     vector_size = 10*10 + 7 + 4
     model = Model(env)
@@ -289,7 +288,7 @@ def run_vid(config = {}):
 
     display = Display(visible=0, size=(1400,900))
     display.start()
-    env = gym.make('CarRacing-v1')
+    env = gym.make('CarRacingTest-v1')
     env = wrappers.Monitor(env, 'monitor-folder', force=False, resume = True, video_callable=None, mode='evaluation')
 
     vector_size = 10*10 + 7 + 4

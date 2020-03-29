@@ -3,6 +3,8 @@ import time
 import os
 import sys
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from gym import wrappers
 from gym.wrappers.monitoring import stats_recorder, video_recorder
@@ -19,9 +21,11 @@ from pprint import pprint
 import cv2
 import datetime
 from collections import deque
-import ringbuffer
+# import ringbuffer
 import pickle as pkl
 import json
+from keras_trainer import ringbuffer
+
 
 def plot_running_avg(totalrewards):
   N = len(totalrewards)
@@ -103,7 +107,7 @@ def create_nn(model_to_load, stack_len):
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
         # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-        adamax = Adamax() #Adamax(lr=0.001)
+        adamax = Adamax(lr=0.01) #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
         model.save(model_to_load)
         
@@ -114,7 +118,6 @@ class DQNAgent():
         K.clear_session()
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
-        #env = wrappers.Monitor(env, 'monitor-folder', force=True)
         self.carConfig = carConfig
         self.curr_pointer = 0
         self.env = env
@@ -274,7 +277,7 @@ class DQNAgent():
             if not self.model_name:
                 eps = 0.01 #0.5/np.sqrt(n + 100)
             else: # want to use a very small eps during retraining
-                eps = 0.01
+                eps = 0.1
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        

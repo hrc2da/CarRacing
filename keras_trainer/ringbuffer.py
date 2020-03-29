@@ -1,4 +1,5 @@
 import random
+import pickle as pkl
 class RingBuffer:
     def __init__(self, size):
         # Pro-tip: when implementing a ring buffer, always allocate one extra element,
@@ -28,6 +29,17 @@ class RingBuffer:
             out.append(it)
 
         return out
+
+    def save(self, file_name):
+        with open(file_name, 'wb+') as f:
+            pkl.dump(self.data, f)
+        
+
+    def load(self, file_name):
+        with open(file_name, 'rb') as f:
+            data = pkl.load(f)
+        for d in data:
+            self.append(d)
         
     def __getitem__(self, idx):
         return self.data[(self.start + idx) % len(self.data)]
