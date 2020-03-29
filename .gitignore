@@ -1,4 +1,9 @@
-venv/
+venv/*
 __pycache__/
 .vscode/*
 flaskapp/static/*
+tf_logs/*
+train_logs/*
+src/*
+*.zip
+*.pyc
