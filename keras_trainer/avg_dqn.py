@@ -91,11 +91,15 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn(model_to_load, stack_len):
+def create_nn(model_to_load, stack_len, freeze_hidden=False):
     try:
         m = load_model(model_to_load)
         print("Loaded pretrained model " + model_to_load)
         init_weights = m.get_weights()
+        # only do this if loading a saved model. why would we freeze weights on a trained model?
+        if freeze_hidden == True:
+            m.layers[1].trainable = False # not sure if this is the right way to do this
+            m.compile()
         return m, init_weights
     except Exception as e:
         print(e)
@@ -114,7 +118,7 @@ def create_nn(model_to_load, stack_len):
         return model, model.get_weights()
 
 class DQNAgent():
-    def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
+    def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20, freeze_hidden=False):
         K.clear_session()
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
@@ -126,7 +130,7 @@ class DQNAgent():
         self.stack_len = 4  # number of continuous frames to stack
         self.model_name = model_name
         #model_name = "flask_model/avg_dqn_4_seq_model_every50_2_100.h5"
-        self.model, self.init_weights = create_nn(model_name, self.stack_len)  # consecutive steps, 111-element vector for each state
+        self.model, self.init_weights = create_nn(model_name, self.stack_len, freeze_hidden)  # consecutive steps, 111-element vector for each state
         self.target_models = []
         for _ in range(self.K):
             target_model, _ = create_nn(model_name, self.stack_len)
@@ -250,7 +254,8 @@ class DQNAgent():
             stacked_state = np.append(stacked_state[1:], [curr_state], axis=0) # appending the lastest frame, pop the oldest
             # print('state shape: ', stacked_state.shape)
             # add to memory
-            self.memory.append((prev_state, argmax_qval, reward, stacked_state))
+            if train == True:
+                self.memory.append((prev_state, argmax_qval, reward, stacked_state))
             if iters%100==0:
                 self.curr_pointer += 1
                 self.update_targets()
