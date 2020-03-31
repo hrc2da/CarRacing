@@ -319,7 +319,7 @@ class DQNAgent():
             plt.close()
             plot_running_avg(totalrewards)
             with open(os.path.join(os.getcwd(), "train_logs/avg_dqn_total_rewards_final.pkl",'wb+')) as outfile:
-                pkl.dump(totalreward, outfile)
+                pkl.dump(totalrewards, outfile)
         self.env.close()
 
 if __name__ == "__main__":
