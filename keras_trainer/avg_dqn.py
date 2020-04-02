@@ -24,6 +24,7 @@ from collections import deque
 # import ringbuffer
 import pickle as pkl
 import json
+sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 from keras_trainer import ringbuffer
 
 
@@ -80,6 +81,8 @@ def compute_steering_speed_gyro_abs(a):
     gyro = (right_gyro - left_gyro + 1.0)/2
     
     speed = a[:, 0][:-2].mean()/255
+    # if speed>0:
+    #     print("speed element: ", speed)
     abs1 = a[:, 6][:-2].mean()/255
     abs2 = a[:, 8][:-2].mean()/255
     abs3 = a[:, 10][:-2].mean()/255
@@ -98,18 +101,16 @@ def create_nn(model_to_load, stack_len):
         init_weights = m.get_weights()
         return m, init_weights
     except Exception as e:
-        print(e)
-        print("Creating new network")
         model = Sequential()
         model.add(Dense(512, input_shape=(stack_len*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
         model.add(Activation('relu'))
 
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
-        # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
         adamax = Adamax(lr=0.01) #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
-        model.save(model_to_load)
+        if model_to_load:
+            model.save(model_to_load)
         
         return model, model.get_weights()
 
@@ -136,9 +137,11 @@ class DQNAgent():
         self.replay_freq = replay_freq
         if not model_name:
             MEMORY_SIZE = 10000
+            self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         else:
             MEMORY_SIZE = 5000  # smaller memory for retraining
-        self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
+            self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
+            self.memory.load(os.path.join(os.getcwd(),"keras_trainer/dumped_memory_3eps.pkl")) #load memory
         self.num_episodes = num_episodes
 
     def predict(self, s):
@@ -275,9 +278,9 @@ class DQNAgent():
         for n in range(self.num_episodes):
             print("training ", str(n))
             if not self.model_name:
-                eps = 0.01 #0.5/np.sqrt(n + 100)
+                eps = 1/np.sqrt(n + 100)
             else: # want to use a very small eps during retraining
-                eps = 0.1
+                eps = 0.01
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
