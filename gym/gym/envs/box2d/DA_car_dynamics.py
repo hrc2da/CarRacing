@@ -66,6 +66,21 @@ class Car:
         drive_train = [0,0,1,1],
         hull_densities = [1,1,1,1]):
 
+        self.config = {
+            "eng_power": eng_power,
+            "wheel_moment": wheel_moment,
+            "friction_lim": friction_lim,
+            "wheel_rad": wheel_rad,
+            "wheel_width": wheel_width,
+            "wheel_pos": wheel_pos,
+            "hull_poly1": hull_poly1,
+            "hull_poly2": hull_poly2,
+            "hull_poly3": hull_poly3,
+            "hull_poly4": hull_poly4,
+            "drive_train": drive_train,
+            "hull_densities": hull_densities
+        }
+
         self.size = size
         self.hull_densities = hull_densities
         self.eng_power = eng_power
