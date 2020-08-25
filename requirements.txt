@@ -20,7 +20,6 @@ Flask-SocketIO==3.0.0
 future==0.16.0
 gast==0.2.0
 grpcio==1.12.0
--e git+https://github.com/hrc2da/carracing@4ff4f4f2933202f0fe74f4a9365aecdd97a4fb6a#egg=gym&subdirectory=gym
 h5py==2.7.1
 html5lib==0.9999999
 idna==2.6
@@ -59,7 +58,6 @@ requests==2.18.4
 schwimmbad==0.3.0
 scikit-learn==0.19.1
 scipy==1.1.0
-six==1.11.0
 socketIO-client==0.7.2
 SQLAlchemy==1.0.13
 ssh-import-id==5.5
