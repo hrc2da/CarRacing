@@ -1,62 +1,55 @@
+"""
+Top-down car dynamics simulation.
+
+Some ideas are taken from this great tutorial http://www.iforce2d.net/b2dtut/top-down-car by Chris Campbell.
+This simulation is a bit more detailed, with wheels rotation.
+
+Created by Oleg Klimov. Licensed on the same terms as the rest of OpenAI Gym.
+"""
+
 import numpy as np
 import math
 import Box2D
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener, shape)
 
-# Top-down car dynamics simulation.
-#
-# Some ideas are taken from this great tutorial http://www.iforce2d.net/b2dtut/top-down-car by Chris Campbell.
-# This simulation is a bit more detailed, with wheels rotation.
-#
-# Created by Oleg Klimov. Licensed on the same terms as the rest of OpenAI Gym.
+SIZE = 0.02
+ENGINE_POWER = 100000000*SIZE*SIZE
+WHEEL_MOMENT_OF_INERTIA = 4000*SIZE*SIZE
+FRICTION_LIMIT = 1000000*SIZE*SIZE     # friction ~= mass ~= size^2 (calculated implicitly using density)
+WHEEL_R = 27
+WHEEL_W = 14
+WHEELPOS = [
+    (-55, +80), (+55, +80),
+    (-55, -82), (+55, -82)
+    ]
+HULL_POLY1 = [
+    (-60, +130), (+60, +130),
+    (+60, +110), (-60, +110)
+    ]
+HULL_POLY2 = [
+    (-15, +120), (+15, +120),
+    (+20, +20), (-20, 20)
+    ]
+HULL_POLY3 = [
+    (+25, +20),
+    (+50, -10),
+    (+50, -40),
+    (+20, -90),
+    (-20, -90),
+    (-50, -40),
+    (-50, -10),
+    (-25, +20)
+    ]
+HULL_POLY4 = [
+    (-50, -120), (+50, -120),
+    (+50, -90),  (-50, -90)
+    ]
+WHEEL_COLOR = (0.0,  0.0, 0.0)
+WHEEL_WHITE = (0.3, 0.3, 0.3)
+MUD_COLOR = (0.4, 0.4, 0.0)
 
-# SIZE = 0.02
-# ENGINE_POWER            = 100000000*SIZE*SIZE
-# WHEEL_MOMENT_OF_INERTIA = 4000*SIZE*SIZE
-# FRICTION_LIMIT          = 1000000*SIZE*SIZE     # friction ~= mass ~= size^2 (calculated implicitly using density)
-# WHEEL_R  = 27
-# WHEEL_W  = 100
-# WHEELPOS = [
-#     (-15,+80), (+15,+80),
-#     (-15,-82), (+15,-82)
-#     ]
-# HULL_POLY1 =[
-#     (-10,+130), (+10,+130),
-#     (+10,+110), (-10,+110)
-#     ]
-# HULL_POLY2 =[
-#     (-15,+120), (+15,+120),
-#     (+10, +20), (-10,  20)
-#     ]
-# HULL_POLY3 =[
-#     (+15, +20),
-#     (+10, -10),
-#     (+10, -40),
-#     (+10, -90),
-#     (-10, -90),
-#     (-10, -40),
-#     (-10, -10),
-#     (-15, +20)
-#     ]
-# HULL_POLY4 =[
-#     (-50,-120), (+50,-120),
-#     (+50,-90),  (-50,-90)
-#     ]
-
-
-WHEEL_COLOR = (0.0,0.0,0.0)
-WHEEL_WHITE = (0.3,0.3,0.3)
-MUD_COLOR   = (0.8,0.4,0.8)
 
 class Car:
-    # def __init__(self, world, init_angle, init_x, init_y, size = 0.02, 
-    #     eng_power = 40000, wheel_moment = 1.6, friction_lim = 400,
-    #     wheel_rad = 27, wheel_width = 100, wheel_pos = [(-15,+80), (+15,+80),(-15,-82), (+15,-82)],
-    #     hull_poly1 = [(-10,+130), (+10,+130),(+10,+110), (-10,+110)], hull_poly2 = [(-15,+120), (+15,+120),(+10, +20), (-10,  20)],
-    #     hull_poly3 = [(+15, +20),(+10, -10),(+10, -40),(+10, -90),(-10, -90),(-10, -40),(-10, -10),(-15, +20)],
-    #     hull_poly4 = [(-50,-120), (+50,-120),(+50,-90),  (-50,-90)],
-    #     drive_train = [0,0,1,1],
-    #     hull_densities = [1,1,1,1]):
     def __init__(self, world, init_angle, init_x, init_y, size = 0.02, 
         eng_power = 40000, wheel_moment = 1.6, friction_lim = 400,
         wheel_rad = 27, wheel_width = 14, wheel_pos = [(-55,+80), (+55,+80),(-55,-82), (+55,-82)],
@@ -64,8 +57,11 @@ class Car:
         hull_poly3 = [  (+25, +20),(+50, -10),(+50, -40),(+20, -90),(-20, -90),(-50, -40),(-50, -10),(-25, +20)],
         hull_poly4 = [(-50,-120), (+50,-120),(+50,-90),  (-50,-90)],
         drive_train = [0,0,1,1],
-        hull_densities = [1,1,1,1]):
-
+        hull_densities = [1.0,1.0,1.0,1.0],
+        steering_scalar = 0.5,
+        rear_steering_scalar = 0.0,
+        brake_scalar = 1.0,
+        max_speed = 90):
         self.config = {
             "eng_power": eng_power,
             "wheel_moment": wheel_moment,
@@ -78,11 +74,18 @@ class Car:
             "hull_poly3": hull_poly3,
             "hull_poly4": hull_poly4,
             "drive_train": drive_train,
-            "hull_densities": hull_densities
+            "hull_densities": hull_densities,
+            "steering_scalar": steering_scalar,
+            "rear_steering_scalar": rear_steering_scalar,
+            "brake_scalar": brake_scalar,
+            "max_speed": max_speed
         }
-
         self.size = size
         self.hull_densities = hull_densities
+        self.steering_scalar = steering_scalar # NEW: "power steering"
+        self.rear_steering_scalar = rear_steering_scalar # NEW: do the back wheels turn inversely and by how much
+        self.brake_scalar = brake_scalar # NEW: amount to scale the braking force by (should be greater than 0)
+        self.max_speed = max_speed # NEW: amount in mph above which the throttle will not work
         self.eng_power = eng_power
         self.wheel_moment = wheel_moment
         self.friction_lim = friction_lim
@@ -93,43 +96,41 @@ class Car:
         self.hull_poly1 = hull_poly1
         self.hull_poly2 = hull_poly2
         self.hull_poly3 = hull_poly3
-        self.hull_poly4 = hull_poly4
-
-
+        self.hull_poly4 = hull_poly4        
         self.world = world
         self.hull = self.world.CreateDynamicBody(
-            position = (init_x, init_y),
-            angle = init_angle,
-            fixtures = [
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly1 ]), density=self.hull_densities[0]),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly2 ]), density=self.hull_densities[1]),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly3 ]), density=self.hull_densities[2]),
-                fixtureDef(shape = polygonShape(vertices=[ (x*self.size,y*self.size) for x,y in self.hull_poly4 ]), density=self.hull_densities[3])
+            position=(init_x, init_y),
+            angle=init_angle,
+            fixtures=[
+                fixtureDef(shape=polygonShape(vertices=[(x*self.size, y*self.size) for x, y in self.hull_poly1]), density=self.hull_densities[0]),
+                fixtureDef(shape=polygonShape(vertices=[(x*self.size, y*self.size) for x, y in self.hull_poly2]), density=self.hull_densities[1]),
+                fixtureDef(shape=polygonShape(vertices=[(x*self.size, y*self.size) for x, y in self.hull_poly3]), density=self.hull_densities[2]),
+                fixtureDef(shape=polygonShape(vertices=[(x*self.size, y*self.size) for x, y in self.hull_poly4]), density=self.hull_densities[3])
                 ]
             )
-        self.hull.color = (0.8,0.0,0.0)
+        self.hull.color = (0.0, 0.0, 0.8)
         self.wheels = []
         self.fuel_spent = 0.0
         self.grass_traveled = 0.0
-        self.wheel_poly= [
-            (-self.wheel_width,+self.wheel_rad), (+self.wheel_width,+self.wheel_rad),
-            (+self.wheel_width,-self.wheel_rad), (-self.wheel_width,-self.wheel_rad)
+        self.wheel_poly = [
+            (+self.wheel_width, -self.wheel_rad), (-self.wheel_width, -self.wheel_rad),
+            (-self.wheel_width, +self.wheel_rad), (+self.wheel_width, +self.wheel_rad),
             ]
-        for wx,wy in self.wheel_pos:
+        for wx, wy in self.wheel_pos:
             front_k = 1.0 if wy > 0 else 1.0
             w = self.world.CreateDynamicBody(
-                position = (init_x+wx*self.size, init_y+wy*self.size),
-                angle = init_angle,
-                fixtures = fixtureDef(
-                    shape=polygonShape(vertices=[ (x*front_k*self.size,y*front_k*self.size) for x,y in self.wheel_poly ]),
-                    density=.1,
+                position=(init_x+wx*self.size, init_y+wy*self.size),
+                angle=init_angle,
+                fixtures=fixtureDef(
+                    shape=polygonShape(vertices=[(x*front_k*self.size,y*front_k*self.size) for x, y in self.wheel_poly]),
+                    density=0.1,
                     categoryBits=0x0020,
                     maskBits=0x001,
                     restitution=0.0)
                     )
             w.wheel_rad = front_k*self.wheel_rad*self.size
-            w.color = WHEEL_COLOR
-            w.gas   = 0.0
+            w.color = WHEEL_COLOR # TODO: update this to base tire color on tread!!!!
+            w.gas = 0.0
             w.brake = 0.0
             w.steer = 0.0
             w.phase = 0.0  # wheel angle
@@ -139,53 +140,72 @@ class Car:
             rjd = revoluteJointDef(
                 bodyA=self.hull,
                 bodyB=w,
-                localAnchorA=(wx*self.size,wy*self.size),
+                localAnchorA=(wx*self.size, wy*self.size),
                 localAnchorB=(0,0),
                 enableMotor=True,
                 enableLimit=True,
                 maxMotorTorque=180*900*self.size*self.size,
-                motorSpeed = 0,
-                lowerAngle = -0.4,
-                upperAngle = +0.4,
+                motorSpeed=0,
+                lowerAngle=-0.4,
+                upperAngle=+0.4,
                 )
             w.joint = self.world.CreateJoint(rjd)
             w.tiles = set()
             w.userData = w
             self.wheels.append(w)
-        self.drawlist =  self.wheels + [self.hull]
+        self.drawlist = self.wheels + [self.hull]
         self.particles = []
+    
+    
 
     def gas(self, gas):
-        'control: rear wheel drive'
+        """control: rear wheel drive
+
+        Args:
+            gas (float): How much gas gets applied. Gets clipped between 0 and 1.
+        """
+        if np.linalg.norm(self.hull.linearVelocity )> self.max_speed:
+            return
         gas = np.clip(gas, 0, 1)
-        for i,w in enumerate(self.wheels[0:4]):
-            if(self.drive_train[i] == 1):
-                diff = gas - w.gas
-                if diff > 0.1: diff = 0.1  # gradually increase, but stop immediately
-                w.gas += diff
+        for w in self.wheels[2:4]:
+            diff = gas - w.gas
+            if diff > 0.1: diff = 0.1  # gradually increase, but stop immediately
+            w.gas += diff
 
     def brake(self, b):
-        'control: brake b=0..1, more than 0.9 blocks wheels to zero rotation'
+        """control: brake
+
+        Args:
+            b (0..1): Degree to which the brakes are applied. More than 0.9 blocks the wheels to zero rotation"""
+        assert self.brake_scalar >= 0
+        # if np.linalg.norm(self.hull.linearVelocity )> 10 and b == 0:
+        #     for w in self.wheels:
+        #         w.brake = 0.5
+        # else:
         for w in self.wheels:
-            w.brake = b
+            w.brake = self.brake_scalar*b
 
     def steer(self, s):
-        'control: steer s=-1..1, it takes time to rotate steering wheel from side to side, s is target position'
-        self.wheels[0].steer = s
-        self.wheels[1].steer = s
+        """control: steer
+
+        Args:
+            s (-1..1): target position, it takes time to rotate steering wheel from side-to-side"""
+        # scale and clamp s to (-1,1)
+        s_scaled = max(-1, min(self.steering_scalar*s,1))
+        # s_scaled = self.steering_scalar*s
+        self.wheels[0].steer = s_scaled
+        self.wheels[1].steer = s_scaled
+        self.wheels[2].steer = self.rear_steering_scalar*-s
+        self.wheels[3].steer = self.rear_steering_scalar*-s
 
     def step(self, dt):
         for w in self.wheels:
             # Steer each wheel
             dir = np.sign(w.steer - w.joint.angle)
             val = abs(w.steer - w.joint.angle)
-            try:
-                if len(val) > 0:
-                    val = np.float32(val[0])
-            except:
-                pass
-            w.joint.motorSpeed = float(dir)*min(50.0*val, np.float32(3.0))
-
+            # TODO: There's a try/except here in my code. Check why it's there/if we need it.
+            w.joint.motorSpeed = dir*min(50.0*val, 3.0) # TODO: I'm casting to a float here. not sure why.
+            # Matt: Weird, this looks like a differential drive????
             # Position => friction_limit
             grass = True
             friction_limit = self.friction_lim*0.6  # Grass friction if no tile
@@ -193,7 +213,8 @@ class Car:
                 friction_limit = max(friction_limit, self.friction_lim*tile.road_friction)
                 grass = False
             if grass == True:
-                self.grass_traveled += 1
+                self.grass_traveled += 1 # if we didn't hit any tiles, then we're on the grass?
+
             # Force
             forw = w.GetWorldVector( (0,1) )
             side = w.GetWorldVector( (1,0) )
@@ -204,7 +225,9 @@ class Car:
             # WHEEL_MOMENT_OF_INERTIA*np.square(w.omega)/2 = E -- energy
             # WHEEL_MOMENT_OF_INERTIA*w.omega * domega/dt = dE/dt = W -- power
             # domega = dt*W/WHEEL_MOMENT_OF_INERTIA/w.omega
-            w.omega += dt*self.eng_power*w.gas/self.wheel_moment/(abs(w.omega)+5.0)  # small coef not to divide by zero
+
+            # add small coef not to divide by zero
+            w.omega += dt*self.eng_power*w.gas/self.wheel_moment/(abs(w.omega)+5.0)
             self.fuel_spent += dt*self.eng_power*w.gas
 
             if w.brake >= 0.9:
@@ -223,13 +246,15 @@ class Car:
 
             # Physically correct is to always apply friction_limit until speed is equal.
             # But dt is finite, that will lead to oscillations if difference is already near zero.
-            f_force *= 205000*self.size*self.size  # Random coefficient to cut oscillations in few steps (have no effect on friction_limit)
+
+            # Random coefficient to cut oscillations in few steps (have no effect on friction_limit)
+            f_force *= 205000*self.size*self.size
             p_force *= 205000*self.size*self.size
             force = np.sqrt(np.square(f_force) + np.square(p_force))
 
             # Skid trace
             if abs(force) > 2.0*friction_limit:
-                if w.skid_particle and w.skid_particle.grass==grass and len(w.skid_particle.poly) < 30:
+                if w.skid_particle and w.skid_particle.grass == grass and len(w.skid_particle.poly) < 30:
                     w.skid_particle.poly.append( (w.position[0], w.position[1]) )
                 elif w.skid_start is None:
                     w.skid_start = w.position
@@ -248,9 +273,12 @@ class Car:
                 p_force *= force
 
             w.omega -= dt*f_force*w.wheel_rad/self.wheel_moment
+
             w.ApplyForceToCenter( (
-                float(p_force*side[0] + f_force*forw[0]),
-                float(p_force*side[1] + f_force*forw[1])), True )
+                p_force*side[0] + f_force*forw[0],
+                p_force*side[1] + f_force*forw[1]), True ) #again, we were casting to float here, and now no longer
+
+        # print(np.linalg.norm(self.hull.angularVelocity))
 
     def draw(self, viewer, draw_particles=True):
         if draw_particles:
@@ -268,9 +296,9 @@ class Car:
                 s2 = math.sin(a2)
                 c1 = math.cos(a1)
                 c2 = math.cos(a2)
-                if s1>0 and s2>0: continue
-                if s1>0: c1 = np.sign(c1)
-                if s2>0: c2 = np.sign(c2)
+                if s1 > 0 and s2 > 0: continue
+                if s1 > 0: c1 = np.sign(c1)
+                if s2 > 0: c2 = np.sign(c2)
                 white_poly = [
                     (-self.wheel_width*self.size, +self.wheel_rad*c1*self.size), (+self.wheel_width*self.size, +self.wheel_rad*c1*self.size),
                     (+self.wheel_width*self.size, +self.wheel_rad*c2*self.size), (-self.wheel_width*self.size, +self.wheel_rad*c2*self.size)
@@ -283,7 +311,7 @@ class Car:
         p = Particle()
         p.color = WHEEL_COLOR if not grass else MUD_COLOR
         p.ttl = 1
-        p.poly = [(point1[0],point1[1]), (point2[0],point2[1])]
+        p.poly = [(point1[0], point1[1]), (point2[0], point2[1])]
         p.grass = grass
         self.particles.append(p)
         while len(self.particles) > 30:

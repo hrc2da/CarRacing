@@ -135,7 +135,25 @@ register(
     reward_threshold=900,
 )
 register(
+    id='CarRacingRandomTrack-v1',
+    entry_point='gym.envs.box2d:DACarRacingRandomTrack',
+    max_episode_steps=500,
+    reward_threshold=900,
+)
+register(
+    id='CarRacingRandomStart-v1',
+    entry_point='gym.envs.box2d:DACarRacingRandomStart',
+    max_episode_steps=500,
+    reward_threshold=900,
+)
+register(
     id='CarRacingTest-v1',
+    entry_point='gym.envs.box2d:DACarRacing',
+    max_episode_steps=1000,
+    reward_threshold=900,
+)
+register(
+    id='CarRacing-v1',
     entry_point='gym.envs.box2d:DACarRacing',
     max_episode_steps=1000,
     reward_threshold=900,
