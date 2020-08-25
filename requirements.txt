@@ -64,7 +64,7 @@ socketIO-client==0.7.2
 SQLAlchemy==1.0.13
 ssh-import-id==5.5
 tensorboard==1.8.0
-tensorflow==1.8.0
+tensorflow==1.15.2
 termcolor==1.1.0
 urllib3==1.23
 websocket-client==0.47.0
