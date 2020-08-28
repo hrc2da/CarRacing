@@ -3,3 +3,6 @@ from gym.envs.box2d.lunar_lander import LunarLanderContinuous
 from gym.envs.box2d.bipedal_walker import BipedalWalker, BipedalWalkerHardcore
 from gym.envs.box2d.car_racing import CarRacing
 from gym.envs.box2d.DA_car_racing import DACarRacing
+from gym.envs.box2d.DA_car_racing_random_start import DACarRacingRandomStart 
+# I think these are the same ^^^^^
+from gym.envs.box2d.DA_car_racing_random_track import DACarRacingRandomTrack 

@@ -98,6 +98,28 @@ def create_nn(model_to_load):
         
         return model.to(device), model.state_dict(), loss_fn, optimizer
 
+class DenseQNetwork(nn.Module):
+    h1_size = 512
+    h2_size = 256
+    def __init__(self, state_size, action_size):
+        super(DenseQNetwork, self).__init__()
+        self.input_layer = torch.nn.Linear(state_size, self.h1_size)
+        self.h1_layer = torch.nn.Linear(self.h1_size, self.h2_size)
+        self.h2_layer = torch.nn.Linear(self.h2_size, action_size)
+        self.relu1 = torch.nn.ReLU()
+        self.relu2 = torch.nn.ReLU()
+        self.sigmoid = torch.nn.Sigmoid()
+        
+
+    def forward(self, state):
+        input_out = self.input_layer(state)
+        input_activated = self.relu1(input_out)
+        h1_out = self.h1_layer(input_activated)
+        h1_activated = self.relu2(h1_out)
+        q_vals = self.h2_layer(h1_activated)
+        return q_vals
+
+
 class DQNAgent():
     def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20):
         env = gym.make('CarRacingTrain-v1')
@@ -130,10 +152,12 @@ class DQNAgent():
         return total_w/len(self.past_weights)
 
     def predict(self, s):
-        return self.model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
+        #return self.model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
+        return self.model(s)
 
     def target_predict(self, s):
-        return self.target_model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
+        #return self.target_model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
+        return self.target_model(s)
 
     def add_weights(self):
         model_weights = self.model.state_dict()
@@ -144,7 +168,7 @@ class DQNAgent():
 
     def sample_action(self, s, eps):
         # print('THE SHAPE FOR PREDICTION: ', s.shape)
-        qvals = self.predict(s)
+        qvals = self.predict(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
         if np.random.random() < eps:
             return torch.randint(low=0,high=11,size=(1,)), qvals #pytorch randint upper bound is one above sample range
         else:
@@ -191,6 +215,8 @@ class DQNAgent():
         targets = None
         predictions = None
         for (old_state, argmax_qval, reward, next_state) in batch:
+            old_state = torch.from_numpy(np.reshape(old_state, (1, 4*111))).float().to(device).requires_grad_()
+            next_state = torch.from_numpy(np.reshape(next_state, (1, 4*111))).float().to(device)
             self.target_model.load_state_dict(self.past_weights[0]) #fix the creation of this
             with torch.no_grad(): # I think we can turn off gradient tracking since we are not back-prop'ing these
                 total_next_pred = self.target_predict(next_state) # returns tensor
@@ -201,14 +227,14 @@ class DQNAgent():
                 max_next_pred = torch.max(next_state_pred)
             old_state_pred = self.predict(old_state)
             target_q_value = reward + self.gamma * max_next_pred
-            target = old_state_pred[:].detach()
+            target = old_state_pred.clone().detach() #is this the same as detach.clone but worse performance?
             target[0, argmax_qval] = target_q_value #in-place is ok b/c no gradient needed (I think)
             if targets is None:
                 targets = target
                 predictions = old_state_pred
             else:
-                torch.cat((targets,target))
-                torch.cat((predictions,old_state_pred))
+                targets = torch.cat((targets,target))
+                predictions = torch.cat((predictions,old_state_pred))
         loss = self.loss_fn(predictions,targets)
         self.optimizer.zero_grad()
         loss.backward()
@@ -275,10 +301,10 @@ class DQNAgent():
                 eps = 0.1
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
-            print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
+            print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())     
             if n>0 and n%500==0 and not self.model_name:
                 # save model
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_torch_{}.h5".format(str(n)))
+                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_torch_2_{}.h5".format(str(n)))
                 torch.save(self.model.state_dict(), trained_model)
 
         if self.model_name:
@@ -287,7 +313,7 @@ class DQNAgent():
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards.png")
+            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards_torch_2.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()

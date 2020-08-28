@@ -7,3 +7,10 @@ train_logs/*
 src/*
 *.zip
 *.pyc
+train_logs*
+*.pkl
+rand_car_experience_dump*
+monitor-folder*
+logbak*
+updated_gym_train_logs*
+flask_model*

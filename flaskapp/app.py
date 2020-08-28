@@ -3,7 +3,6 @@ from flask_socketio import SocketIO,send,emit
 from flask_cors import CORS
 import os,sys
 # sys.path.append('/share/sandbox/')
-sys.path.append('/home/hrc2/hrcd/cars/carracing')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 sys.path.append('/home/dev/scratch/cars/carracing_clean')
 #from carracing.agents.nsgaii import nsgaii_agent
@@ -51,11 +50,12 @@ def testdrive(train=False):
     #t.start()
     #t.join()
     # want to train it for a few episodes first
-    trained_model_name = os.path.join(os.getcwd(),"keras_trainer/avg_dqn_trained_model_5000_retrain.h5")
+    # trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_4_seq_model_every50_3_500_flask.h5")
+    trained_model_name = "/home/dev/scratch/cars/carracing_clean/agents/pretrained_drivers/avg_dqn_scratch_driver0.h5"
     # trained_model_name = os.path.join(os.getcwd(),"flask_model/avg_dqn_retraining_100.h5") ## PUT THE NAME OF YOUR (RE)TRAINING MODEL HERE!!!
     
     num_episodes -= 1 # train for n-1 and then call play_once to get the video
-    driver = DQNAgent(num_episodes, trained_model_name, car_config, 20)
+    driver = DQNAgent(num_episodes, trained_model_name, car_config, replay_freq=50, freeze_hidden=False)
     if num_episodes > 0:
         training = True       
         driver.train()
@@ -68,6 +68,7 @@ def testdrive(train=False):
     result = driver.play_one(train=training,video_path=filename,eps=0)
     driver.memory.save(os.path.join(os.getcwd(),"dumped_memory.pkl"))
     driver.env.close()
+    import pdb; pdb.set_trace()
     return jsonify({"video":filename, "result": result})
 #    result = run_unparsed(carConfig, os.path.join('../static',filename),display)
 #    return jsonify({"video":filename,"result":result})

@@ -1,0 +1,390 @@
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:45:02] "GET /socket.io/?EIO=3&transport=polling&t=N4LpJO2 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:07] "GET /socket.io/?EIO=3&transport=polling&t=N4LpKcL HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LpLqZ HTTP/1.1" 400 -
+episode: 0 iters 500 total reward: 769.5488721804438 eps: 0.01 avg reward (last 100): 769.5488721804438
+training  1
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:45:17] "GET /socket.io/?EIO=3&transport=polling&t=N4LpN2n HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:22] "GET /socket.io/?EIO=3&transport=polling&t=N4LpOH1 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:27] "GET /socket.io/?EIO=3&transport=polling&t=N4LpPVG HTTP/1.1" 400 -
+episode: 1 iters 500 total reward: 777.0676691729243 eps: 0.01 avg reward (last 100): 773.3082706766841
+training  2
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:45:32] "GET /socket.io/?EIO=3&transport=polling&t=N4LpQjV HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:37] "GET /socket.io/?EIO=3&transport=polling&t=N4LpRxi HTTP/1.1" 400 -
+episode: 2 iters 500 total reward: 356.0150375939825 eps: 0.01 avg reward (last 100): 634.2105263157836
+training  3
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:45:42] "GET /socket.io/?EIO=3&transport=polling&t=N4LpT9x HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:47] "GET /socket.io/?EIO=3&transport=polling&t=N4LpUOB HTTP/1.1" 400 -
+episode: 3 iters 500 total reward: 483.8345864661585 eps: 0.01 avg reward (last 100): 596.6165413533772
+training  4
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:45:52] "GET /socket.io/?EIO=3&transport=polling&t=N4LpVcW HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:45:57] "GET /socket.io/?EIO=3&transport=polling&t=N4LpWqm HTTP/1.1" 400 -
+episode: 4 iters 500 total reward: 762.0300751879627 eps: 0.01 avg reward (last 100): 629.6992481202943
+training  5
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:02] "GET /socket.io/?EIO=3&transport=polling&t=N4LpY2- HTTP/1.1" 400 -
+episode: 5 iters 500 total reward: 468.79699248120045 eps: 0.01 avg reward (last 100): 602.8822055137787
+training  6
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:07] "GET /socket.io/?EIO=3&transport=polling&t=N4LpZHC HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LpaVR HTTP/1.1" 400 -
+episode: 6 iters 500 total reward: 416.1654135338287 eps: 0.01 avg reward (last 100): 576.2083780880715
+training  7
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:17] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpbjg HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:22] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpcxu HTTP/1.1" 400 -
+episode: 7 iters 500 total reward: 762.0300751879619 eps: 0.01 avg reward (last 100): 599.4360902255578
+training  8
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:27] "GET /socket.io/?EIO=3&transport=polling&t=N4LpeA7 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:32] "GET /socket.io/?EIO=3&transport=polling&t=N4LpfOQ HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:37] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpgce HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:42] "GET /socket.io/?EIO=3&transport=polling&t=N4Lphqt HTTP/1.1" 400 -
+episode: 8 iters 500 total reward: 17.66917293233037 eps: 0.01 avg reward (last 100): 534.7953216374214
+training  9
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:47] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpj35 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:46:52] "GET /socket.io/?EIO=3&transport=polling&t=N4LpkHK HTTP/1.1" 400 -
+episode: 9 iters 500 total reward: 498.8721804511206 eps: 0.01 avg reward (last 100): 531.2030075187913
+training  10
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:46:57] "GET /socket.io/?EIO=3&transport=polling&t=N4LplVZ HTTP/1.1" 400 -
+episode: 10 iters 500 total reward: 844.7368421052548 eps: 0.01 avg reward (last 100): 559.706083390288
+training  11
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:02] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpmjo HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:07] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpny0 HTTP/1.1" 400 -
+episode: 11 iters 500 total reward: 814.6616541353309 eps: 0.01 avg reward (last 100): 580.9523809523749
+training  12
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LppAE HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:17] "GET /socket.io/?EIO=3&transport=polling&t=N4LpqOS HTTP/1.1" 400 -
+episode: 12 iters 500 total reward: 739.4736842105181 eps: 0.01 avg reward (last 100): 593.1463273568475
+training  13
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:22] "GET /socket.io/?EIO=3&transport=polling&t=N4Lprch HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:27] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpsqw HTTP/1.1" 400 -
+episode: 13 iters 500 total reward: 739.4736842105182 eps: 0.01 avg reward (last 100): 603.598281417824
+training  14
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:32] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpu37 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:37] "GET /socket.io/?EIO=3&transport=polling&t=N4LpvHP HTTP/1.1" 400 -
+episode: 14 iters 500 total reward: 777.0676691729234 eps: 0.01 avg reward (last 100): 615.162907268164
+training  15
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:42] "GET /socket.io/?EIO=3&transport=polling&t=N4LpwVg HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:47] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpxjw HTTP/1.1" 400 -
+episode: 15 iters 500 total reward: 807.1428571428489 eps: 0.01 avg reward (last 100): 627.1616541353317
+training  16
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:47:52] "GET /socket.io/?EIO=3&transport=polling&t=N4Lpyy9 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:47:57] "GET /socket.io/?EIO=3&transport=polling&t=N4Lp-AN HTTP/1.1" 400 -
+episode: 16 iters 500 total reward: 754.5112781954814 eps: 0.01 avg reward (last 100): 634.652808491811
+training  17
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:02] "GET /socket.io/?EIO=3&transport=polling&t=N4Lp_Oc HTTP/1.1" 400 -
+episode: 17 iters 500 total reward: 513.9097744360837 eps: 0.01 avg reward (last 100): 627.9448621553818
+training  18
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:07] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq0cw HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:48:12] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq1r9 HTTP/1.1" 400 -
+episode: 18 iters 500 total reward: 701.8796992481144 eps: 0.01 avg reward (last 100): 631.8361693707888
+training  19
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:17] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq33O HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:48:22] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq4Hd HTTP/1.1" 400 -
+episode: 19 iters 500 total reward: 769.5488721804435 eps: 0.01 avg reward (last 100): 638.7218045112716
+training  20
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:27] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq5Vr HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:48:32] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq6k5 HTTP/1.1" 400 -
+episode: 20 iters 500 total reward: 829.6992481202924 eps: 0.01 avg reward (last 100): 647.8159684926535
+training  21
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:37] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq7yK HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:48:42] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq9AX HTTP/1.1" 400 -
+episode: 21 iters 500 total reward: 453.7593984962379 eps: 0.01 avg reward (last 100): 638.9952153109982
+training  22
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:47] "GET /socket.io/?EIO=3&transport=polling&t=N4LqAOl HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:48:52] "GET /socket.io/?EIO=3&transport=polling&t=N4LqBc- HTTP/1.1" 400 -
+episode: 22 iters 500 total reward: 754.5112781954816 eps: 0.01 avg reward (last 100): 644.0176528277149
+training  23
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:48:57] "GET /socket.io/?EIO=3&transport=polling&t=N4LqCrD HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:02] "GET /socket.io/?EIO=3&transport=polling&t=N4LqE3S HTTP/1.1" 400 -
+episode: 23 iters 500 total reward: 882.3308270676599 eps: 0.01 avg reward (last 100): 653.947368421046
+training  24
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:49:07] "GET /socket.io/?EIO=3&transport=polling&t=N4LqFHg HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LqGVv HTTP/1.1" 400 -
+episode: 24 iters 500 total reward: 807.1428571428478 eps: 0.01 avg reward (last 100): 660.075187969918
+training  25
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:49:17] "GET /socket.io/?EIO=3&transport=polling&t=N4LqHk7 HTTP/1.1" 400 -
+episode: 25 iters 500 total reward: 716.9172932330763 eps: 0.01 avg reward (last 100): 662.2614227877318
+training  26
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:49:22] "GET /socket.io/?EIO=3&transport=polling&t=N4LqIyN HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:27] "GET /socket.io/?EIO=3&transport=polling&t=N4LqKAb HTTP/1.1" 400 -
+episode: 26 iters 500 total reward: 438.7218045112708 eps: 0.01 avg reward (last 100): 653.9821776663814
+training  27
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:49:32] "GET /socket.io/?EIO=3&transport=polling&t=N4LqLOp HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:37] "GET /socket.io/?EIO=3&transport=polling&t=N4LqMd1 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:42] "GET /socket.io/?EIO=3&transport=polling&t=N4LqNrG HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:47] "GET /socket.io/?EIO=3&transport=polling&t=N4LqP3V HTTP/1.1" 400 -
+episode: 27 iters 500 total reward: 777.0676691729234 eps: 0.01 avg reward (last 100): 658.3780880773294
+training  28
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:49:52] "GET /socket.io/?EIO=3&transport=polling&t=N4LqQHl HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:49:57] "GET /socket.io/?EIO=3&transport=polling&t=N4LqRVz HTTP/1.1" 400 -
+episode: 28 iters 500 total reward: 814.6616541353291 eps: 0.01 avg reward (last 100): 663.767176562088
+training  29
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:02] "GET /socket.io/?EIO=3&transport=polling&t=N4LqSkC HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:50:07] "GET /socket.io/?EIO=3&transport=polling&t=N4LqTyQ HTTP/1.1" 400 -
+episode: 29 iters 500 total reward: 739.4736842105191 eps: 0.01 avg reward (last 100): 666.2907268170358
+training  30
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LqVAf HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:50:17] "GET /socket.io/?EIO=3&transport=polling&t=N4LqWOt HTTP/1.1" 400 -
+episode: 30 iters 500 total reward: 777.0676691729238 eps: 0.01 avg reward (last 100): 669.8641765704515
+training  31
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:22] "GET /socket.io/?EIO=3&transport=polling&t=N4LqXd5 HTTP/1.1" 400 -
+episode: 31 iters 500 total reward: 754.5112781954801 eps: 0.01 avg reward (last 100): 672.5093984962336
+training  32
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:27] "GET /socket.io/?EIO=3&transport=polling&t=N4LqYrJ HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:50:32] "GET /socket.io/?EIO=3&transport=polling&t=N4Lqa3X HTTP/1.1" 400 -
+episode: 32 iters 500 total reward: 506.39097744360663 eps: 0.01 avg reward (last 100): 667.4755069491844
+training  33
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:37] "GET /socket.io/?EIO=3&transport=polling&t=N4LqbHm HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:50:42] "GET /socket.io/?EIO=3&transport=polling&t=N4LqcV- HTTP/1.1" 400 -
+episode: 33 iters 500 total reward: 814.661654135329 eps: 0.01 avg reward (last 100): 671.8045112781886
+training  34
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:47] "GET /socket.io/?EIO=3&transport=polling&t=N4LqdkD HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:50:52] "GET /socket.io/?EIO=3&transport=polling&t=N4LqeyR HTTP/1.1" 400 -
+episode: 34 iters 500 total reward: 716.9172932330746 eps: 0.01 avg reward (last 100): 673.093447905471
+training  35
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:50:57] "GET /socket.io/?EIO=3&transport=polling&t=N4LqgAg HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:02] "GET /socket.io/?EIO=3&transport=polling&t=N4LqhOv HTTP/1.1" 400 -
+episode: 35 iters 500 total reward: 589.0977443608944 eps: 0.01 avg reward (last 100): 670.7602339181217
+training  36
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:07] "GET /socket.io/?EIO=3&transport=polling&t=N4Lqid8 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:12] "GET /socket.io/?EIO=3&transport=polling&t=N4LqjrM HTTP/1.1" 400 -
+episode: 36 iters 500 total reward: 897.3684210526225 eps: 0.01 avg reward (last 100): 676.8847795163514
+training  37
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:17] "GET /socket.io/?EIO=3&transport=polling&t=N4Lql3b HTTP/1.1" 400 -
+episode: 37 iters 500 total reward: 829.6992481202923 eps: 0.01 avg reward (last 100): 680.9062129006655
+training  38
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:23] "GET /socket.io/?EIO=3&transport=polling&t=N4LqmHr HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:28] "GET /socket.io/?EIO=3&transport=polling&t=N4LqnW4 HTTP/1.1" 400 -
+episode: 38 iters 500 total reward: 581.5789473684138 eps: 0.01 avg reward (last 100): 678.3593599383001
+training  39
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:33] "GET /socket.io/?EIO=3&transport=polling&t=N4LqokJ HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:38] "GET /socket.io/?EIO=3&transport=polling&t=N4LqpyX HTTP/1.1" 400 -
+episode: 39 iters 500 total reward: 852.255639097736 eps: 0.01 avg reward (last 100): 682.706766917286
+training  40
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:43] "GET /socket.io/?EIO=3&transport=polling&t=N4LqrAm HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:48] "GET /socket.io/?EIO=3&transport=polling&t=N4LqsO- HTTP/1.1" 400 -
+episode: 40 iters 500 total reward: 528.9473684210453 eps: 0.01 avg reward (last 100): 678.9565376856705
+training  41
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:51:53] "GET /socket.io/?EIO=3&transport=polling&t=N4LqtdD HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:51:58] "GET /socket.io/?EIO=3&transport=polling&t=N4LqurS HTTP/1.1" 400 -
+episode: 41 iters 500 total reward: 762.0300751879614 eps: 0.01 avg reward (last 100): 680.9344790547726
+training  42
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:03] "GET /socket.io/?EIO=3&transport=polling&t=N4Lqw3h HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:52:08] "GET /socket.io/?EIO=3&transport=polling&t=N4LqxHv HTTP/1.1" 400 -
+episode: 42 iters 500 total reward: 882.3308270676599 eps: 0.01 avg reward (last 100): 685.6181150550724
+training  43
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:13] "GET /socket.io/?EIO=3&transport=polling&t=N4LqyW8 HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:52:18] "GET /socket.io/?EIO=3&transport=polling&t=N4LqzkM HTTP/1.1" 400 -
+episode: 43 iters 500 total reward: 829.6992481202914 eps: 0.01 avg reward (last 100): 688.8926862611
+training  44
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:23] "GET /socket.io/?EIO=3&transport=polling&t=N4Lq-yb HTTP/1.1" 400 -
+episode: 44 iters 500 total reward: 746.9924812029984 eps: 0.01 avg reward (last 100): 690.1837928153644
+training  45
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:28] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr0Ap HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:52:33] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr1P2 HTTP/1.1" 400 -
+episode: 45 iters 500 total reward: 829.6992481202914 eps: 0.01 avg reward (last 100): 693.2167374959063
+training  46
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:38] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr2dG HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:52:43] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr3rV HTTP/1.1" 400 -
+episode: 46 iters 500 total reward: 551.5037593984943 eps: 0.01 avg reward (last 100): 690.2015677491528
+training  47
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:48] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr53j HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:52:53] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr6Hy HTTP/1.1" 400 -
+episode: 47 iters 500 total reward: 739.4736842105174 eps: 0.01 avg reward (last 100): 691.2280701754313
+training  48
+TRAINING WITH CAR CONFIG: 
+{'hull_poly1': [[-21, 130], [21, 130], [60, 110], [-60, 110]], 'hull_poly2': [[-15, 120], [15, 120], [20, 20], [-20, 20]], 'hull_poly3': [[25, 20], [31, -10], [24, -40], [20, -90], [-20, -90], [-24, -40], [-31, -10], [-25, 20]], 'hull_poly4': [[-50, -120], [50, -120], [50, -90], [-50, -90]], 'hull_densities': [1, 1, 1, 1], 'eng_power': 60000, 'wheel_pos': [[-55, 80], [55, 80], [-55, -82], [55, -82]], 'wheel_width': 18, 'wheel_rad': 27, 'wheel_moment': 1.6, 'drive_train': [0, 0, 1, 1], 'friction_lim': 1000}
+<TimeLimit<DACarRacing<CarRacingTrain-v1>>>
+Loaded track: <_io.BufferedReader name='/home/dev/scratch/cars/carracing_clean/gym/gym/envs/box2d/da_track.pkl'>
+127.0.0.1 - - [26/Mar/2020 03:52:58] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr7WE HTTP/1.1" 400 -
+127.0.0.1 - - [26/Mar/2020 03:53:03] "GET /socket.io/?EIO=3&transport=polling&t=N4Lr8kT HTTP/1.1" 400 -
+episode: 48 iters 500 total reward: 543.9849624060087 eps: 0.01 avg reward (last 100): 688.2231087923819

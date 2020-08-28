@@ -72,6 +72,9 @@ vector_size = 10*10 + 7 + 4
 
 
 def create_nn(model_to_load):
+    input_shape = 10*111
+    h1_shape = 512
+    output_shape = 11
     try:
         model = torch.nn.Sequential(
             torch.nn.Linear(input_shape, h1_shape),
@@ -83,17 +86,14 @@ def create_nn(model_to_load):
         init_weights = m.state_dict()
         return m, init_weights
     except:
-        print("Creating new network")
-        input_shape = 4*111
-        h1_shape = 512
-        output_shape = 11
-        
+        print("Creating new network")      
         model = torch.nn.Sequential(
             torch.nn.Linear(input_shape, h1_shape),
-            torch.nn.ReLU(),
+            torch.nn.ReLU(), 
             torch.nn.Linear(h1_shape, output_shape)
         )
         loss_fn = torch.nn.MSELoss()
+        #optimizer = torch.optim.SGD(model.parameters(),lr=0.01)
         optimizer = torch.optim.Adamax(model.parameters())
         
         return model.to(device), model.state_dict(), loss_fn, optimizer
@@ -131,11 +131,11 @@ class DQNAgent():
 
     def predict(self, s):
         #return self.model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
-        return self.model.forward(s)
+        return self.model(s)
 
     def target_predict(self, s):
         #return self.target_model.forward(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
-        return self.model.forward(s)
+        return self.model(s)
 
     def add_weights(self):
         model_weights = self.model.state_dict()
@@ -146,7 +146,7 @@ class DQNAgent():
 
     def sample_action(self, s, eps):
         # print('THE SHAPE FOR PREDICTION: ', s.shape)
-        qvals = self.predict(torch.from_numpy(np.reshape(s, (1, 4*111))).float().to(device))
+        qvals = self.predict(torch.from_numpy(np.reshape(s, (1, 10*111))).float().to(device))
         if np.random.random() < eps:
             return torch.randint(low=0,high=11,size=(1,)), qvals #pytorch randint upper bound is one above sample range
         else:
@@ -189,12 +189,13 @@ class DQNAgent():
         return [steering, gaz, brake]
 
     def replay(self, batch_size):
+        self.optimizer.zero_grad()
         batch = self.memory.sample(batch_size)
         targets = None
         predictions = None
         for (old_state, argmax_qval, reward, next_state) in batch:
-            old_state = torch.from_numpy(np.reshape(old_state, (1, 4*111))).float().to(device)#.requires_grad_()
-            next_state = torch.from_numpy(np.reshape(next_state, (1, 4*111))).float().to(device)
+            old_state = torch.from_numpy(np.reshape(old_state, (1, 10*111))).float().to(device)#.requires_grad_()
+            next_state = torch.from_numpy(np.reshape(next_state, (1, 10*111))).float().to(device)
             self.target_model.load_state_dict(self.past_weights[0]) #fix the creation of this
             #with torch.no_grad(): # I think we can turn off gradient tracking since we are not back-prop'ing these
             total_next_pred = self.target_predict(next_state) # returns tensor
@@ -214,10 +215,10 @@ class DQNAgent():
                 targets = target
                 predictions = old_state_pred
             else:
-                torch.cat((targets,target))
-                torch.cat((predictions,old_state_pred))
+                targets = torch.cat((targets,target))
+                predictions = torch.cat((predictions,old_state_pred))
+        
         loss = self.loss_fn(predictions,targets)
-        self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
@@ -236,7 +237,7 @@ class DQNAgent():
         iters = 0
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        stacked_state = np.array([state,state,state, state])
+        stacked_state = np.array([state,state,state,state,state,state,state,state,state,state])
         # print('state shape: ', stacked_state.shape)
         while not done:
             argmax_qval, qval = self.sample_action(stacked_state, eps)
@@ -285,7 +286,7 @@ class DQNAgent():
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())     
             if n>0 and n%500==0 and not self.model_name:
                 # save model
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_torch_3_{}.h5".format(str(n)))
+                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_trained_model_torch_10stack_{}.h5".format(str(n)))
                 torch.save(self.model.state_dict(), trained_model)
 
         if self.model_name:
@@ -294,7 +295,7 @@ class DQNAgent():
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards_torch_3.png")
+            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_10000_rewards_torch_10stack.png")
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()

@@ -162,7 +162,7 @@ class DACarRacing(gym.Env):
                     
 
                 self.track = track
-                print("Loaded track: {}".format(trackfile))
+                # print("Loaded track: {}".format(trackfile))
                 #trackfile.close()
                 return True
         except FileNotFoundError:

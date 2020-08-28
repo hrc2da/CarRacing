@@ -64,7 +64,22 @@ class Car:
         hull_poly3 = [  (+25, +20),(+50, -10),(+50, -40),(+20, -90),(-20, -90),(-50, -40),(-50, -10),(-25, +20)],
         hull_poly4 = [(-50,-120), (+50,-120),(+50,-90),  (-50,-90)],
         drive_train = [0,0,1,1],
-        hull_densities = [1,1,1,1]):
+        hull_densities = [1.0,1.0,1.0,1.0]):
+
+        self.config = {
+            "eng_power": eng_power,
+            "wheel_moment": wheel_moment,
+            "friction_lim": friction_lim,
+            "wheel_rad": wheel_rad,
+            "wheel_width": wheel_width,
+            "wheel_pos": wheel_pos,
+            "hull_poly1": hull_poly1,
+            "hull_poly2": hull_poly2,
+            "hull_poly3": hull_poly3,
+            "hull_poly4": hull_poly4,
+            "drive_train": drive_train,
+            "hull_densities": hull_densities
+        }
 
         self.size = size
         self.hull_densities = hull_densities

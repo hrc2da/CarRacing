@@ -1,12 +1,17 @@
 import sys, traceback
 import random
-sys.path.append('/share/sandbox/')
-sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+sys.path.append('/home/dev/scratch/cars/carracing_clean')
 #from schwimmbad import MultiPool
-from platypus import NSGAII, Problem, Type, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job, Generator
+from platypus import GeneticAlgorithm, NSGAII, Problem, Type, Real, Binary, Integer,ProcessPoolEvaluator, PoolEvaluator,CompoundOperator,SBX,HUX,MultiprocessingEvaluator, run_job, Generator, Solution, InjectedPopulation
 from platypus.config import default_variator
 from collections import namedtuple
-from keras_trainer.run_car import run, init_buffer, kill_buffer
+# from keras_trainer.run_car import init_buffer, kill_buffer
+# from keras_trainer.run_car import run as car_run
+from keras_trainer.avg_dqn import DQNAgent
+from pyvirtualdisplay import Display
+from copy import deepcopy
+import time
+import json
 '''
 Car Config Format:
 self.eng_power = int
@@ -52,87 +57,278 @@ gym_reward:
 fuel_consumption:
 num_grass_tiles:
 '''
+def init_buffer():
+    #testing os level display fix
+    global orig
+    #testing os level display fix
+    display = Display(visible=0,size=(1400,900))
+    display.start()
+    #orig = os.environ["DISPLAY"]
+    return display
+
+def kill_buffer(display):
+    display.sendstop()
+
+def log_result(algorithm_object):
+    print("CALLBACKING!!!!")
+    outcomes = [r.objectives[0] for r in algorithm_object.result]
+    outcomes.sort(reverse=True)
+    algorithm_object.generations.append(outcomes)
+    print(f'Generation {len(algorithm_object.generations)-1}: {outcomes}')
+
 class nsgaii_agent:
-        def __init__(self,session_id=None):
-                self.n_iters=100000
-                self.session_id=session_id
-                self.problem = Problem(24,3,6)
-                self.problem.types = [Integer(1e6,1e9), #eng_power
-                                        NormReal(4e2,4e4), #wheel_moment
-                                        NormReal(1e3,1e6), #friction_lim
-                                        Integer(15,100), #wheel_rad
-                                        Integer(15,100), #wheel_width
-                                        Integer(-250,-10), #wheel1_x
-                                        Integer(10,125), #wheel1_y
-                                        Integer(10,125), #wheel2_x
-                                        #Integer(10,500), #wheel2_y
-                                        Integer(-125,-10), #wheel3_x 
-                                        Integer(-250,-10), #wheel3_y
-                                        Integer(10,125), #wheel4_x
-                                        #Integer(-500,-10), #wheel4_y
-                                        Binary(4), #drive_train]
-                                        Integer(5,300), #bumper_width
-                                        NormReal(0.1,2), #spoiler_density
-                                        Integer(10,250), #hull1_width1
-                                        Integer(10,250), #hull1_width2
-                                        Integer(10,250), #hull1_length
-                                        NormReal(0.1,2), #hull1_density
-                                        Integer(10,250), #hull2_width1
-                                        Integer(10,250), #hull2_width2
-                                        Integer(10,250), #hull2_length
-                                        NormReal(0.1,2), #hull_density
-                                        Integer(5,300), #spoiler_width
-                                        NormReal(0.1,2)] #spoiler_density
-                self.problem.constraints[:] = "<=0"
-                self.problem.function = self.evaluate
-                self.problem.directions = [self.problem.MAXIMIZE,self.problem.MINIMIZE,self.problem.MINIMIZE]
-                dummy_problem = namedtuple('dummy_problem','types')
-                variators = [default_variator(dummy_problem(types=[Real(0,1) if type(t)==Integer else t])) for t in self.problem.types]
-                print("VARIATOR",variators[0])
-                self.variator = CompoundOperator(*list(set(variators)))
-        def evaluate(self, config):
-                m1 = max(config[14],config[15])
-                m2 = max(config[18], config[19])
-                l1 = config[16]
-                l2 = config[20]
-                x1 = config[5]
-                y1 = config[6]
-                y2 = config[9]
-                x2 = config[7]
-                x3 = config[8]
-                x4 = config[10]
-                return self.simulate(config), [-m1/2 - x1,-m1/2+x2 ,-m2/2-x4 ,-m2/2+x3,-l1 + y1 ,-l2 - y2]
-        def pack(self,config):
-                packed_config = {}
-                packed_config['eng_power'] = config[0]
-                packed_config['wheel_moment'] = config[1]
-                packed_config['friction_lim'] = config[2]
-                packed_config['wheel_rad'] = config[3]
-                packed_config['wheel_width'] = config[4]
-                packed_config['wheel_pos'] = [(config[5],config[6]),
-                                                (config[7],config[6]),
-                                                (config[8],config[9]),
-                                                (config[10],config[9])]
-                packed_config['drive_train'] = config[11]
-                packed_config['bumper'] = {'w':config[12],'d':config[13]}
-                packed_config['hull_poly1'] = {'w1':config[14],'w2':config[15],'l':config[16],'d':config[17]}
-                packed_config['hull_poly2'] = {'w1':config[18],'w2':config[19],'l':config[20],'d':config[21]}
-                packed_config['spoiler'] = {'w':config[22],'d':config[23]}
-                return packed_config
-        def simulate(self,config):
-                #print("about to import keras for simulate")
-                #print("evaluating a car")
-                return run(self.pack(config),session_id=self.session_id)
-                #return [1,2,3]
-        def run(self):
-            display = init_buffer()
-            print("starting the pool now")
-            with errorBlindMultiprocessingEvaluator(3) as evaluator:
-                print("got an evaluator")
-                algorithm = NSGAII(self.problem, evaluator=evaluator, population_size=20,variator=self.variator)
-                print("initialized algorithm")
-                algorithm.run(self.n_iters)
-            kill_buffer(display)
+    def __init__(self,session_id=None):
+        self.n_iters=50 #00000
+        self.population_size = 50
+        self.offspring_size = 50
+        self.session_id=session_id
+        self.problem = Problem(20,1) # 20 variables, 1 objectives, 0 constraints (we need constraints more for wheelpos)
+        
+        # we fix the wheel pos, since chopshop doesn't allow user to change it
+        # for the body shape, we are fixing the y vals
+        # allowing the GA to expand horizontally on each axis
+        # but symmetrically
+        # this matches what chopshop allows
+        # thus there are two variables for all polys except hull_poly3
+        # which is an octagon and has four.
+
+        self.problem.types = [Integer(1e3,1e6), #eng_power          0
+                                NormReal(0,5), #wheel_moment        1
+                                NormReal(0,1e4), #friction_lim      2
+                                Integer(10,100), #wheel_rad         3
+                                Integer(10,100), #wheel_width       4
+                                Binary(4), #drive_train             5
+                                Integer(5,300), #bumper_width1      6
+                                Integer(5,300), #bumper_width2      7
+                                NormReal(0.1,2), #bumper_density    8
+                                Integer(10,250), #hull2_width1      9
+                                Integer(10,250), #hull2_width2      10
+                                NormReal(0.1,2), #hull2_density     11
+                                Integer(10,250), #hull3_width1      12
+                                Integer(10,250), #hull3_width2      13
+                                Integer(10,250), #hull3_width3      14
+                                Integer(10,250), #hull3_width4      15
+                                NormReal(0.1,2), #hull3_density     16
+                                Integer(5,300), #spoiler_width1     17
+                                Integer(5,300), #spoiler_width2     18
+                                NormReal(0.1,2)] #spoiler_density   19
+        # self.problem.constraints[:] = "<=0" #constraints returned in the second half of evaluate tuple
+        self.problem.function = self.evaluate
+        self.problem.directions = [self.problem.MAXIMIZE]#,self.problem.MINIMIZE,self.problem.MINIMIZE]
+        dummy_problem = namedtuple('dummy_problem','types')
+        variators = [default_variator(dummy_problem(types=[Real(0,1) if type(t)==Integer else t])) for t in self.problem.types]
+        print("VARIATOR",variators[0])
+        self.variator = CompoundOperator(*list(set(variators)))
+
+        # setup an initial population (leave empty if you don't want one)
+        seed_car = Solution(self.problem)
+        eng_power = 40000
+        wheel_moment = 1.6
+        friction_lim = 400
+        wheel_rad = 27
+        wheel_width = 14
+        wheel_pos = [(-55,+80), (+55,+80),(-55,-82), (+55,-82)]
+        hull_poly1 = [(-60,+130), (+60,+130), (+60,+110), (-60,+110)]
+        hull_poly2 = [(-15,+120), (+15,+120),(+20, +20), (-20,  20)]
+        hull_poly3 = [  (+25, +20),(+50, -10),(+50, -40),(+20, -90),(-20, -90),(-50, -40),(-50, -10),(-25, +20)]
+        hull_poly4 = [(-50,-120), (+50,-120),(+50,-90),  (-50,-90)]
+        drive_train = [0,0,1,1]
+        hull_densities = [1,1,1,1]
+        seed_car_config =  {
+            "eng_power": eng_power,
+            "wheel_moment": wheel_moment,
+            "friction_lim": friction_lim,
+            "wheel_rad": wheel_rad,
+            "wheel_width": wheel_width,
+            "wheel_pos": wheel_pos,
+            "hull_poly1": hull_poly1,
+            "hull_poly2": hull_poly2,
+            "hull_poly3": hull_poly3,
+            "hull_poly4": hull_poly4,
+            "drive_train": drive_train,
+            "hull_densities": hull_densities
+        }
+        seed_car_config_arr = self.unpack(self.unparse_config(seed_car_config))
+        seed_car.variables = seed_car_config_arr
+        self.init_pop = [deepcopy(seed_car) for i in range(self.population_size//10)]
+        self.driver = DQNAgent(num_episodes=1, model_name='/home/dev/scratch/cars/carracing_clean/agents/pretrained_drivers/avg_dqn_ep_300.h5')
+    def evaluate(self, config):
+        return self.simulate(config)
+
+    def pack(self,config):
+
+        '''
+        "eng_power": eng_power,
+        "wheel_moment": wheel_moment,
+        "friction_lim": friction_lim,
+        "wheel_rad": wheel_rad,
+        "wheel_width": wheel_width,
+        "wheel_pos": wheel_pos,
+        "hull_poly1": hull_poly1,
+        "hull_poly2": hull_poly2,
+        "hull_poly3": hull_poly3,
+        "hull_poly4": hull_poly4,
+        "drive_train": drive_train,
+        "hull_densities": hull_densities
+        '''
+        packed_config = {}
+        packed_config['eng_power'] = config[0]
+        packed_config['wheel_moment'] = config[1]
+        packed_config['friction_lim'] = config[2]
+        packed_config['wheel_rad'] = config[3]
+        packed_config['wheel_width'] = config[4]
+        packed_config['drive_train'] = config[5]
+        packed_config['bumper'] = {'w1':config[6], 'w2':config[7], 'd':config[8]}
+        packed_config['hull_poly2'] = {'w1':config[9],'w2':config[10],'d':config[11]}
+        packed_config['hull_poly3'] = {'w1':config[12],'w2':config[13],'w3':config[14],'w4':config[15],'d':config[16]}
+        packed_config['spoiler'] = {'w1':config[17], 'w2':config[18], 'd':config[19]}
+        return packed_config
+
+    def unpack(self,config):
+        '''
+            return an array version of an unparsed config
+        '''
+        unpacked_config = [0 for i in range(20)]
+        unpacked_config[0] = config['eng_power']    
+        unpacked_config[1] = config['wheel_moment']
+        unpacked_config[2] = config['friction_lim']
+        unpacked_config[3] = config['wheel_rad']
+        unpacked_config[4] = config['wheel_width']
+        unpacked_config[5] = config['drive_train']
+        unpacked_config[6] = config['bumper']['w1']
+        unpacked_config[7] = config['bumper']['w2']
+        unpacked_config[8] = config['bumper']['d']
+        unpacked_config[9] = config['hull_poly2']['w1']
+        unpacked_config[10] = config['hull_poly2']['w2']
+        unpacked_config[11] = config['hull_poly2']['d']
+        unpacked_config[12] = config['hull_poly3']['w1']
+        unpacked_config[13] = config['hull_poly3']['w2']
+        unpacked_config[14] = config['hull_poly3']['w3']
+        unpacked_config[15] = config['hull_poly3']['w4']
+        unpacked_config[16] = config['hull_poly3']['d']
+        unpacked_config[17] = config['spoiler']['w1']
+        unpacked_config[18] = config['spoiler']['w2']
+        unpacked_config[19] = config['spoiler']['d']
+        return [self.problem.types[i].encode(unpacked_config[i]) for i in range(self.problem.nvars)]
+
+    def parse_config(self,config):
+        l1 = 0
+        l2 = 0
+        spoiler_d = 35 #TODO: check that these match the poly's on the baseline car
+        bumper_d = 25
+        densities =[0,0,0,0]
+        # for reference, from the baseline car: 
+        # bumper is hull_poly1, spoiler is hull_poly4
+        # hull_poly1 = [(-60,+130), (+60,+130), (+60,+110), (-60,+110)]
+        # hull_poly2 = [(-15,+120), (+15,+120),(+20, +20), (-20,  20)]
+        # hull_poly3 = [  (+25, +20),(+50, -10),(+50, -40),(+20, -90),(-20, -90),(-50, -40),(-50, -10),(-25, +20)]
+        # hull_poly4 = [(-50,-120), (+50,-120),(+50,-90),  (-50,-90)]
+        bumper_y1 = 130
+        bumper_y2 = 110
+        h2_y1 = 120
+        h2_y2 = 20
+        h3_y1 = 20
+        h3_y2 = -10
+        h3_y3 = -40
+        h3_y4 = -90
+        spoiler_y1 = -120
+        spoiler_y2 = -90
+        if(config == {}):
+            return config
+        else:
+            if("bumper" in config.keys()):
+                bumper = config["bumper"]
+                config["hull_poly1"] = [(-bumper['w1']/2, bumper_y1),(bumper["w1"]/2, bumper_y1),( bumper["w2"]/2, bumper_y2),(-bumper["w2"]/2, bumper_y2)]
+                densities[0] = bumper["d"]
+                del config["bumper"]
+
+            if("hull_poly2" in config.keys()):
+                hull2 = config["hull_poly2"]
+                config["hull_poly2"] = [(-hull2['w1']/2, h2_y1),(hull2['w1']/2, h2_y1),(hull2['w2']/2, h2_y2),(-hull2['w2']/2, h2_y2)]
+                densities[1] = hull2['d']
+
+            if("hull_poly3" in config.keys()):
+                hull3 = config["hull_poly3"]
+                config["hull_poly3"] = [(hull3['w1']/2, h3_y1),(hull3['w2']/2, h3_y2),(hull3['w3']/2, h3_y3),(hull3['w4']/2, h3_y4), \
+                                        (-hull3['w4']/2, h3_y4),(-hull3['w3']/2, h3_y3),(-hull3['w2']/2, h3_y2),(-hull3['w1']/2, h3_y1)]
+                densities[2] = hull3['d']
+
+            if("spoiler" in config.keys()):
+                spoiler = config["spoiler"]
+                config["hull_poly4"] = [(-spoiler['w1']/2, spoiler_y1),(spoiler['w1']/2, spoiler_y1),(spoiler['w2']/2, spoiler_y2),(-spoiler['w2']/2, spoiler_y2)]
+                densities[3] = spoiler['d']
+                del config["spoiler"]
+
+            config["hull_densities"] = densities
+            config["wheel_pos"] = [(-55,+80), (+55,+80),(-55,-82), (+55,-82)]
+        return config
+
+    def unparse_config(self,config):
+        '''
+            translate a config in the carracing format back into the ga format (packed)
+            This returns a dict, for the GA we need an array.
+            to get all the way to the ga format, call unpack(unparse_config(config))
+            This is reverse-engineered from parse_config
+        '''
+        if(config == {}):
+            return config
+        else:
+            if("hull_poly1" in config.keys()):
+                coords = config["hull_poly1"]
+                config['bumper'] = {'w1':coords[1][0]*2, 'w2':coords[2][0]*2, 'd':config['hull_densities'][0]}
+            if("hull_poly2" in config.keys()):
+                coords = config["hull_poly2"]
+                config['hull_poly2'] = {'w1':coords[1][0]*2,'w2':coords[2][0]*2,'d':config['hull_densities'][1]}
+            if("hull_poly3" in config.keys()):
+                coords = config["hull_poly3"]
+                config['hull_poly3'] = {'w1':coords[0][0]*2,'w2':coords[1][0]*2,'w3':coords[2][0]*2,'w4':coords[3][0]*2,'d':config['hull_densities'][2]}
+            if("hull_poly4" in config.keys()):
+                coords = config["hull_poly4"]
+                config["spoiler"] = {'w1':coords[1][0]*2,'w2':coords[2][0]*2, 'd':config['hull_densities'][3]}
+            del config['hull_poly1']
+            del config['hull_poly4']
+        return config
+    
+
+
+    def simulate(self,config):
+            #print("about to import keras for simulate")
+            #print("evaluating a car")
+            
+            # result = car_run(self.pack(config),session_id=self.session_id)
+            self.driver.carConfig = self.parse_config(self.pack(config))
+            for i in range(5):
+                result = self.driver.play_one(eps=0.1,train=False)[0] # For now, only return the reward (single-objective)
+            return result/5
+            #return [1,2,3]
+        
+
+    def run(self):
+        display = init_buffer()
+        print("starting the pool now")
+        # with errorBlindMultiprocessingEvaluator(3) as evaluator:
+            # print("got an evaluator")
+            # algorithm = NSGAII(self.problem, evaluator=evaluator, population_size=20,variator=self.variator)
+            # print("initialized algorithm")
+            # algorithm.run(self.n_iters)
+            # results = algorithm.result # should be the pareto-sorted population
+            # import pdb; pdb.set_trace() # let's see what we can do with the results object
+        algorithm = GeneticAlgorithm(self.problem, population_size=self.population_size,offspring_size=self.offspring_size,variator=self.variator, generator=InjectedPopulation(self.init_pop))
+        print("initialized algorithm")
+        algorithm.generations = [] # make this a queue for multithreading
+        # first eval plus each iteration of offspring generation
+        algorithm.run(self.population_size + self.n_iters*(self.offspring_size + self.population_size), callback=log_result) # the termination condition is the # max evals, so iters x pop_size
+        results = algorithm.result # should be the pareto-sorted population
+        results.sort(key=lambda x: x.objectives[0])
+        outcomes = [r.objectives[0] for r in results]
+        configs = [self.parse_config(self.pack([self.problem.types[i].decode(v) for i,v in enumerate(r.variables)])) for r in results]    
+        print(configs)
+        print(outcomes)
+        import pdb; pdb.set_trace()
+        with open('/home/dev/scratch/cars/carracing_clean/agents/ga_results_300_driver_avg_5.json','w') as outfile:
+            json.dump([outcomes,configs,algorithm.generations], outfile)
+
+        kill_buffer(display)
 
 
 class NormReal(Real):

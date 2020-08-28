@@ -221,6 +221,7 @@ class Monitor(Wrapper):
         self.video_recorder.capture_frame()
 
     def _close_video_recorder(self):
+        print("CLOSING VIDEO RECORDER")
         self.video_recorder.close()
         if self.video_recorder.functional:
             self.videos.append((self.video_recorder.path, self.video_recorder.metadata_path))

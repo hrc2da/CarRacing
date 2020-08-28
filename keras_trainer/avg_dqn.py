@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 from gym import wrappers
 from gym.wrappers.monitoring import stats_recorder, video_recorder
 from datetime import datetime
+import tensorflow as tf
 import random
 from sklearn.preprocessing import StandardScaler
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-from keras.layers import Embedding
-from keras.optimizers import SGD, RMSprop, Adam, Adamax
-from keras.models import load_model
-from keras import backend as K
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Embedding
+from tensorflow.keras.optimizers import SGD, RMSprop, Adam, Adamax
+from tensorflow.keras.models import load_model
+from tensorflow.keras import backend as K
 from pprint import pprint
 import cv2
 import datetime
@@ -24,18 +24,23 @@ from collections import deque
 # import ringbuffer
 import pickle as pkl
 import json
+sys.path.append('/home/dev/scratch/carracing_clean')
+sys.path.append('/home/dev/scratch/cars/carracing_clean')
+sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 from keras_trainer import ringbuffer
 
 
-def plot_running_avg(totalrewards):
-  N = len(totalrewards)
-  running_avg = np.empty(N)
-  for t in range(N):
-    running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
-  plt.plot(running_avg)
-  plt.title("Running Average")
-  fname = os.path.join(os.getcwd(), "train_logs/avg_dqn_10_seq_ra.png")
-  plt.savefig(fname)
+
+
+def plot_running_avg(totalrewards, filename):
+    N = len(totalrewards)
+    running_avg = np.empty(N)
+    for t in range(N):
+        running_avg[t] = totalrewards[max(0, t-100):(t+1)].mean()
+    plt.plot(running_avg)
+    plt.title("Running Average")
+    plt.savefig(filename)
+    plt.close()
 
 def reset_video_recorder_filename(filename,env):
     if env.video_recorder:
@@ -80,6 +85,8 @@ def compute_steering_speed_gyro_abs(a):
     gyro = (right_gyro - left_gyro + 1.0)/2
     
     speed = a[:, 0][:-2].mean()/255
+    # if speed>0:
+    #     print("speed element: ", speed)
     abs1 = a[:, 6][:-2].mean()/255
     abs2 = a[:, 8][:-2].mean()/255
     abs3 = a[:, 10][:-2].mean()/255
@@ -91,7 +98,7 @@ def compute_steering_speed_gyro_abs(a):
 vector_size = 10*10 + 7 + 4
 
 
-def create_nn(model_to_load, stack_len, freeze_hidden=False):
+def create_nn(model_to_load, stack_len, freeze_hidden=False, lr = 0.01):
     try:
         m = load_model(model_to_load)
         print("Loaded pretrained model " + model_to_load)
@@ -99,26 +106,25 @@ def create_nn(model_to_load, stack_len, freeze_hidden=False):
         # only do this if loading a saved model. why would we freeze weights on a trained model?
         if freeze_hidden == True:
             m.layers[1].trainable = False # not sure if this is the right way to do this
-            m.compile()
+            m.compile(loss='mse', optimizer=Adamax(lr=0.01))
+            
         return m, init_weights
     except Exception as e:
-        print(e)
-        print("Creating new network")
         model = Sequential()
         model.add(Dense(512, input_shape=(stack_len*111,), kernel_initializer="lecun_uniform"))# 7x7 + 3.  or 14x14 + 3 # a
         model.add(Activation('relu'))
 
         model.add(Dense(11, kernel_initializer="lecun_uniform"))
-        # model.add(Activation('linear')) #linear output so we can have range of real-valued outputs
 
-        adamax = Adamax(lr=0.01) #Adamax(lr=0.001)
+        adamax = Adamax(lr=lr) #Adamax(lr=0.001)
         model.compile(loss='mse', optimizer=adamax)
-        model.save(model_to_load)
+        if model_to_load:
+            model.save(model_to_load)
         
         return model, model.get_weights()
 
 class DQNAgent():
-    def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20, freeze_hidden=False):
+    def __init__(self, num_episodes, model_name=None, carConfig=None, replay_freq=20, freeze_hidden=False, lr=0.01, train_dir="train_logs_testing"):
         K.clear_session()
         env = gym.make('CarRacingTrain-v1')
         env = wrappers.Monitor(env, 'flaskapp/static', force=False, resume = True, video_callable=None, mode='evaluation', write_upon_reset=False)
@@ -129,8 +135,9 @@ class DQNAgent():
         self.K = 10
         self.stack_len = 4  # number of continuous frames to stack
         self.model_name = model_name
+        self.train_dir = train_dir
         #model_name = "flask_model/avg_dqn_4_seq_model_every50_2_100.h5"
-        self.model, self.init_weights = create_nn(model_name, self.stack_len, freeze_hidden)  # consecutive steps, 111-element vector for each state
+        self.model, self.init_weights = create_nn(model_name, self.stack_len, freeze_hidden, lr)  # consecutive steps, 111-element vector for each state
         self.target_models = []
         for _ in range(self.K):
             target_model, _ = create_nn(model_name, self.stack_len)
@@ -140,9 +147,11 @@ class DQNAgent():
         self.replay_freq = replay_freq
         if not model_name:
             MEMORY_SIZE = 10000
+            self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
         else:
             MEMORY_SIZE = 5000  # smaller memory for retraining
-        self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
+            self.memory = ringbuffer.RingBuffer(MEMORY_SIZE)
+            # self.memory.load(os.path.join(os.getcwd(),"keras_trainer/dumped_memory_3eps.pkl")) #load memory
         self.num_episodes = num_episodes
 
     def predict(self, s):
@@ -228,8 +237,8 @@ class DQNAgent():
 
     def play_one(self, eps,train=True,video_path=None):
         if self.carConfig:
-            print("TRAINING WITH CAR CONFIG: ")
-            print(self.carConfig)
+            # print("TRAINING WITH CAR CONFIG: ")
+            # print(self.carConfig)
             observation = self.env.reset(self.carConfig)
         else: 
             observation = self.env.reset()
@@ -242,21 +251,24 @@ class DQNAgent():
         iters = 0
         a, b, c = transform(observation)
         state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
-        stacked_state = np.array([state]*self.stack_len)
+        stacked_state = np.array([state]*self.stack_len, dtype='float32')
         while not done:
             argmax_qval, qval = self.sample_action(stacked_state, eps)
             prev_state = stacked_state
             action = self.convert_argmax_qval_to_env_action(argmax_qval)
+            # if not train:
+            #     print("ACTION: ", action)
             observation, reward, done, info = self.env.step(action)
 
             a, b, c = transform(observation)        
             curr_state = np.concatenate((np.array([compute_steering_speed_gyro_abs(a)]).reshape(1,-1).flatten(), b.reshape(1,-1).flatten(), c), axis=0) # this is 3 + 7*7 size vector.  all scaled in range 0..1      
+            curr_state.astype('float32')
             stacked_state = np.append(stacked_state[1:], [curr_state], axis=0) # appending the lastest frame, pop the oldest
             # print('state shape: ', stacked_state.shape)
             # add to memory
             if train == True:
                 self.memory.append((prev_state, argmax_qval, reward, stacked_state))
-            if iters%100==0:
+            if iters%250==0:
                 self.curr_pointer += 1
                 self.update_targets()
             # replay batch from memory every 20 steps
@@ -276,52 +288,71 @@ class DQNAgent():
         return totalreward, iters
 
     def train(self, retrain=False):
+        self.timestamp = time.strftime("%m%d_%H%M")
+        if retrain:
+            self.timestamp += "_retrain"
+        #create directory for this training run
+        dir_name = os.path.join(os.getcwd(), "{}/{}".format(self.train_dir,self.timestamp))
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+
         totalrewards = np.empty(self.num_episodes)
         for n in range(self.num_episodes):
             print("training ", str(n))
             if not self.model_name:
-                eps = 0.01 #0.5/np.sqrt(n + 100)
+                eps = 1/np.sqrt(n + 100)
             else: # want to use a very small eps during retraining
-                eps = 0.1
+                eps = 0.01
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        
             if n>=0 and n%50==0 and not self.model_name:
                 # save model (assuming this is NOT the flask app, which WILL pass a model name)
-                trained_model = os.path.join(os.getcwd(),"train_logs/avg_dqn_{}.h5".format(str(n)))
-                with open("train_logs/avg_dqn_total_rewards_{}.pkl".format(str(n)),'wb+') as outfile:
+                trained_model = os.path.join(os.getcwd(),"{}/{}/avg_dqn_ep_{}.h5".format(self.train_dir,self.timestamp, str(n)))
+                with open(os.path.join(os.getcwd(), "{}/{}/avg_dqn_ep_{}.pkl".format(self.train_dir,self.timestamp, str(n))),'wb+') as outfile:
                     pkl.dump(totalrewards, outfile)
                 self.model.save(trained_model)
+        
 
         if self.model_name:
             # we assume that this IS the flask app; if you are trying to retrain FROM an h5, put it in the flask_model directory for now
-            print('saving: ', self.model_name)
-            self.model.save(self.model_name)
             
-            plt.plot(totalrewards)
-            model_name_no_extension = os.path.splitext(self.model_name)[0]
-            rp_name = os.path.join(os.getcwd(), "{}.png".format(model_name_no_extension))
+            model_name_no_extension = os.path.basename(self.model_name)
+            new_model_name = os.path.join(os.getcwd(), "{}/{}/{}".format(self.train_dir,self.timestamp, model_name_no_extension))
+            print('saving: ', new_model_name)
+            self.model.save(new_model_name)
+            rp_name = os.path.join(os.getcwd(), "{}/{}/rewards_plot_{}.png".format(self.train_dir,self.timestamp, model_name_no_extension))
+            plt.plot(totalrewards, label='retraining reward')
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
-            plot_running_avg(totalrewards)
-            with open("{}_rewards_flask.pkl".format(model_name_no_extension),'wb+') as outfile:
+            rap_name = os.path.join(os.getcwd(), "{}/{}/ra_plot_{}.png".format(self.train_dir,self.timestamp, model_name_no_extension))
+            plot_running_avg(totalrewards, rap_name)
+            with open(os.path.join(os.getcwd(), "{}/{}/{}_rewards_flask.pkl".format(self.train_dir,self.timestamp, model_name_no_extension)),'wb+') as outfile:
                 pkl.dump(totalrewards, outfile)
-            with open("{}_car_config.json".format(model_name_no_extension),'w+') as outfile:
+            with open(os.path.join(os.getcwd(), "{}/{}/{}_car_config.json".format(self.train_dir,self.timestamp, model_name_no_extension)),'w+') as outfile:
                 json.dump(self.carConfig, outfile)
 
 
         if not self.model_name:
             plt.plot(totalrewards)
-            rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn.png")
+            # rp_name = os.path.join(os.getcwd(), "train_logs/avg_dqn_lr001_replay20_cpweights250.png")
+            rp_name = os.path.join(os.getcwd(), "{}/{}/rewards_plot.png".format(self.train_dir,self.timestamp))
             plt.title("Rewards")
             plt.savefig(rp_name)
             plt.close()
-            plot_running_avg(totalrewards)
-            with open(os.path.join(os.getcwd(), "train_logs/avg_dqn_total_rewards_final.pkl",'wb+')) as outfile:
+            rap_name = os.path.join(os.getcwd(), "{}/{}/ra_plot.png".format(self.train_dir,self.timestamp))
+            plot_running_avg(totalrewards, rap_name)
+            # with open(os.path.join(os.getcwd(), "train_logs/avg_dqn_total_rewards_final_lr001_replay20_cpweights250.pkl"),'wb+') as outfile:
+            with open(os.path.join(os.getcwd(), "{}/{}/total_rewards.pkl".format(self.train_dir,self.timestamp)),'wb+') as outfile:
                 pkl.dump(totalrewards, outfile)
         self.env.close()
+        return totalrewards
 
 if __name__ == "__main__":
-    trainer = DQNAgent(1001, None, replay_freq=10)
+    # Load carconfig to train with
+    # with open(os.path.join(os.getcwd(),"keras_trainer/retrain_car_bigwheels.json")) as f:
+    #     car_config = json.load(f)
+
+    trainer = DQNAgent(301, None, replay_freq=10, lr=0.001)#, carConfig=car_config)
     trainer.train()
