@@ -27,6 +27,7 @@ import json
 sys.path.append('/home/dev/scratch/carracing_clean')
 sys.path.append('/home/dev/scratch/cars/carracing_clean')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
+sys.path.append('/carracing')
 from keras_trainer import ringbuffer
 
 

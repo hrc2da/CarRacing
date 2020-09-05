@@ -4,6 +4,7 @@ import numpy as np
 import pickle as pkl
 sys.path.append('/home/dev/scratch/cars/carracing_clean')
 sys.path.append('/content/carracing')
+sys.path.append('/carracing')
 from keras_trainer.avg_dqn_updated_gym import DQNAgent
 
 
