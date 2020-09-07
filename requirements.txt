@@ -52,7 +52,7 @@ python-engineio==2.1.1
 python-socketio==1.9.0
 pytz==2018.4
 PyVirtualDisplay==0.2.1
-PyYAML==3.12
+PyYAML==5.1
 requests==2.18.4
 schwimmbad==0.3.0
 scikit-learn==0.19.1
