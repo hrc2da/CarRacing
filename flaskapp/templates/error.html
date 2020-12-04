@@ -1,0 +1,13 @@
+<head>
+
+</head>
+
+<body>
+    <h2>Sorry, there's been a mistake.</h2>
+    {% if status=='403' %}
+    <p>You are either not logged in or your driver is still training with your car. Please check back later.</p>
+    {% elif status=='404' %}
+    <p>We couldn't find that page or user.</p>
+    {% endif %}
+
+</body>

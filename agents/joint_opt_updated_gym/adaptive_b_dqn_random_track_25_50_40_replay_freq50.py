@@ -7,7 +7,7 @@ sys.path.append('/content/carracing')
 from keras_trainer.avg_dqn_updated_gym import DQNAgent
 
 
-train_dir = 'updated_gym_train_logs_adaptive_25_50_40_design_input_power_outage'
+train_dir = 'updated_gym_train_logs_adaptive_5_100_250_design_input_power_outage'
 # make the log directory before running
 driver = DQNAgent(num_episodes=15, replay_freq=50, lr=0.001, train_dir = train_dir)
 # design features: engine, wheels, tires, body
@@ -231,7 +231,7 @@ if __name__=="__main__":
     x0 = [config]
     y0 = np.array([result])
     rewards = policy_step(config2car(config),49)
-    for i in range(25):  
+    for i in range(5):  
         # set the acquisition function based on how much the agent learned
         split = len(rewards)//2
         growth_ratio = np.mean(rewards[split:])/np.mean(rewards[:split])
@@ -244,7 +244,7 @@ if __name__=="__main__":
         updated_reward = test_drive(config)
         y0[x0.index(config)] = updated_reward
         print(f"Updated Reward: {updated_reward}")
-        results = design_step(x0,y0,iters=50,acq_func=acq_func,kappa=4)
+        results = design_step(x0,y0,iters=100,acq_func=acq_func,kappa=4)
         config = results.x
         print(f'Best design reward: {results.fun}')
         # if x0 is None:
@@ -257,5 +257,5 @@ if __name__=="__main__":
             # x0.extend(results.x_iters)
             # np.concatenate((y0,results.func_vals))
             # import pdb; pdb.set_trace()
-        rewards = policy_step(config2car(config),40)
+        rewards = policy_step(config2car(config),250)
         

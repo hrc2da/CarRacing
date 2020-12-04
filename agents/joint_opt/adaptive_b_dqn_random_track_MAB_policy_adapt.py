@@ -206,7 +206,7 @@ def test_drive(config):
     driver.carConfig = config2car(full_config)
     return -driver.play_one(eps=0.1,train=False)[0]
 
-def design_step(x0,y0,iters=15,seed=42, acq_func="gp_hedge", kappa='1.96',mask_eps=0.1):
+def design_step(x0,y0,iters=15,seed=42, acq_func="gp_hedge", kappa=1.96,mask_eps=0.1):
     global designbounds
     global current_config
     global mask_indices

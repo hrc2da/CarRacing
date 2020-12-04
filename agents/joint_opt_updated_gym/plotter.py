@@ -13,7 +13,7 @@ human_root = "/home/dev/scratch/cars/carracing_clean/train_logs"
 takeover_root = "/home/dev/scratch/cars/carracing_clean/train_logs_adaptive_random_track_scratch_takeover"
 anna_root = "/home/dev/scratch/cars/carracing_clean/train_logs_video_dump_50rf_testing2"
 jihyun_root = "/home/dev/scratch/cars/carracing_clean/train_logs_video_dump_50rf_testing_jihyun"
-design_input_root = "/home/dev/scratch/cars/carracing_clean/updated_gym_train_logs_adaptive_25_50_40_design_input_power_outage"
+design_input_root = "/home/dev/scratch/cars/carracing_clean/updated_gym_train_logs_adaptive_5_100_250_design_input_power_outage"
 # train_root = "/home/dev/scratch/cars/carracing_clean/train_logs_adaptive_random_track_50_ep_warmup"
 
 # files23 = glob.glob(f'{train_root}/0723*/total_rewards.pkl')

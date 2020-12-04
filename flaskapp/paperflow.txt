@@ -1,0 +1,114 @@
+This paper documents a process of trying to figure out a form of collaboration between a human and a search algorithm to design a tool for an RL agent.
+
+Why might we want to do this?
+Reinforcement Learning (RL) seeks to learn a policy for how to act given the state of the world through experience.
+However, useful experience can be difficult or expensive to obtain.
+For example (falling off cliff example)
+To get around this, some have suggested policy shaping, where a human expert supervises the agent's exploration.
+Another possible approach is curriculum Learning, where the engineer gives the agent gradually more difficult experiences to ramp up learning.
+
+In this paper, we ask whether a human can design the tools with which an agent interfaces with the world in order to speed up learning for that specific agent.
+Similar work exists where an agent simultaneously learns a policy while redesigning the body it is trying to control.
+Humans are intuitively empathetic; the practice of user-centered design is based on the ability of human designers to infer the needs of users by observing and interacting witht them.
+
+We studied this in the context of Car Racing, a 2D top-down racing game that serves as a benchmark environment for RL agents.
+The RL agent's task is to drive a racecar around a randomly generated track.
+The agent's performance is measured by how many of the track tiles it covers over the course of the episode.
+Specifically, the reward is calculated per step as -0.1 + num_track_visited/num_track_tiles.
+The agent's action space consists of scalars between 0 and 1 for the brake and gas, as well as -1 to 1 for the steering wheel.
+
+Our agent learns via a variant of Deep Q-Network (DQN) learning, an off-policy, model-free RL algorithm. 
+Building on [], a frame in our state input is a viewport of pixels around the car, as well as extracted information from the game dashboard.
+Each state stacks four of these frames in a row in order to incorporate temporal information.
+The action space is discretized into binary variables for the gas and brake, and discrete angles for the steering wheel.
+The policy is represented as a neural network mapping between states and q-values for each action.
+In order to improve the stability of learning, we maintain separate networks to select and evaluate actions to update the network.
+This has been shown by [DDQN] to reduce overestimation of q-value updates.
+Additionally, the second q-network is actually an ensemble that we average, based on [].
+
+Step 1: Learning to Drive with Human Designed Cars
+
+We tasked our users with redesigning the race car to accomodate behaviors that they observe in the agent learning how to drive the car.
+To do this, we first trained the DQN driver for 250 episodes with the default car.
+We then provided participants with an interface with which they could watch the agent drive, modify the car, and test-drive their changes with the agent.
+Participants were first asked to describe the driver's behavior, what it was doing well or struggling with, and what design changes they anticipated could help.
+They were then encouraged to play with the design until they were satisfied.
+The modifiable design features included the shape of the car's body, the width and radius of the wheels, the tire friction limit, the engine power, the 
+On submitting a final design, participants were asked to describe their design and provide a rational for their design choices.
+With the submitted design, we retrained the agent for a further 250 episodes.
+
+Results:
+
+What we initially found is that the diversity in human creative processes would make it difficult to draw clear conclusions about the efficacy of this.
+For example, participants tried out as many as fifty and as few as two different designs before submitting their final design.
+In their design rationales, some participants focused on reward-related behaviors, like driving straight or staying on the track, while others wrote about "classiness" or "energy efficiency".
+Likewise
+
+Ultimately, some of the human designers created designs with which learning improved with respect to the baseline, but a little more than half created cars with which agent performance actually degraded.
+
+Step 2: Learning to Drive with Computationally Designed Cars
+
+In search of some consistency, we tried replacing the human designer with a search algorithm, similar to prior work on joint policy and design optimization.
+Specifically, we ran Bayesian optimization (BO) with a Gaussian process (GP) surrogate for the mapping between the design space and the episode reward.
+At each step in the search, the BO designer would sample a design based on the current surrogate model, balancing expected performance and information using the lower confidence bound (LCB) acquisition function.
+The initial surrogate model was based on test drive(s) with the default car and randomly sampled designs.
+Following N steps of BO, we retrained the driver with the best performing design tested during the search.
+
+Results:
+
+We found that the, on the whole, the agent learned much better with the BO-designed cars.
+We also found a number of qualitative differences between the BO and human cars.
+For example, the BO cars tended to have much stranger shapes than the human cars.
+Need to find more stuff here as well.
+
+No simulation is perfect, and while a strength of computational design methods are their willingness to explore novel areas of a design space, it is less useful if this takes the form of hacking weaknesses in the simulation or reward.
+
+Could we have humans rate BO designs based on feasibility/aesthetics?
+
+
+
+Step 3: Collaborative Design
+
+Here are four ways that this collaboration could happen:
+
+1. The human could select the most important design features for the BO designer to optimizes.
+    The bottleneck in running BO is the same as for the human designer. 
+    Each test drive with a new design is relatively expensive. 
+    Several of the human designers focused on a small set of features.
+    If humans can infer what features are important, we could use their intuition to reduce the design space and speed up the search.
+    For example, removing color from the search space should theoretically allow more efficient sampling.
+2. The human could design the initial car that the BO designer starts with.
+    Similarly, if the human is able to quickly find a relatively good car, we could use the BO to fine-tune their design.
+    # question here--how far from the human's design does the final BO car tend to be?
+    # also I wonder if we could actually give the BO designer the human's entire search trajectory?
+    # something about the transient phase of the search
+3. The human could select the most important design features for the BO designer to optimize, starting with a car the human designs.
+    This is a combination of the first two.
+4. The human could select design features for the BO designer to optimize based on which features they are confident in with their own design.
+    This is a subtle difference from 3--in this case we are assuming the human is correct about the features they are confident in and using the BO to tune the features that they are not.
+We implemented this as follows:
+1. After designing a car, we asked participants to select which design features are important from a list. Then, we used BO to search over only the selected dimensions, starting from the default car.
+2. We initialized the BO surrogate model using test drives with a car designed by the human participant, with some noise added so the initial designs were slightly different.
+3. We initialized the BO surrogate model using test drives with a car designed by the human participant, and we searched only over the dimensions selected by the human.
+4. After designing a car, we asked participants which design features they were most confident in. Then, starting with their car, we ran BO over the remaining features.
+
+Results:
+In treatments 1,3, and 4, the BO designer did significantly worse with human assistance.
+Why is this? Humans tended to pick very few features? Very few humans selected body-related features.
+
+
+
+
+Discussion:
+Possible topics:
+- designing for an agent vs designign for a human
+- the role of aesthetics in design and computational design
+- performance vs learning (e.g. gonzalo)
+
+
+
+Limitations:
+variance in the agent/policy selected
+agent did not account for the design in its state space
+
+

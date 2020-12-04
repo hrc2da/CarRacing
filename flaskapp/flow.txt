@@ -1,0 +1,291 @@
+1. Frontend: Load the study page. Check for a session ID. Send a POST to /initiate with the ID or null if none.
+2. Backend: /initiate --> if session is null, create a new session. Otherwise, retrieve the session by key.
+
+Each session includes:
+- ready flag
+- videos (paths), grouped by iteration
+- models (paths), grouped by iteration
+- list of configs in order of iteration
+- survey replies
+
+
+
+# experiments
+
+Overall plan:
+8 designs, 5 reps of retrain for each design, for each treatment
+
+Pre-Design:
+Run 10 pre-design agents to get a distribution of 250-step agents
+
+
+Treatment 1: Bayes Opt Only
+Get 8 of these designs post-update (I think I have 3 right now)
+Run 3 trains for each
+
+Treatment 2: Human Design
+For each human design, run 5 250-steppers
+
+Treatment 3: Hybrid
+Get checklist of features from each person who piloted
+Run 5 250-steppers for each
+
+
+
+# october 23 night
+
+# run 3 extra runs for each of the new pilot designs (to get to 4 for each)
+
+# user_id = "540d7a5f797745c3beeababa9048d930" #jiyhun
+# session_override_id = "5f8df42ad5c68de5e8185f59" #jihyun
+
+# user_id = "2a532da3d761421890cc5de28b3ff2f3" #anna
+# session_override_id = "5f90983b8dfbb43775149641" #anna
+
+user_id = "b00a73908f3147b5b35e90936134a77f" #nikhil
+session_override_id = "5f90fdee8dfbb43775149642" #nikhil
+
+
+# october 24 night
+all human designs now have 5 samples
+
+I wrote train_on_design.py to take a design and run 250 episodes with it
+
+I am running anna, jihyun, nikhil, yuhan hybrid designs x4
+
+I also found a bug in utils/car2config: unparse was modifying the car dictionary in place while converting it to a vector so that the config's hull polys were the wrong format.
+Fortunately, this is only called in the bayesopt scripts, and only once, in order to convert the initial config into a vector.
+All the test drives and subsequent training are done on vectors that are converted to car dicts via utils/config2car. config2car both copies the vector and makes a new dict out of it,
+so it should not have the same issue. The original vector is not modified.
+
+I fixed the bug by deepcopying the dict at the start of car2config.
+
+I also found that the json and pkled designs are the same minus some differences in typing, so I'm running all the train_on_design's on the hybrids from json's (the earlier designs don't have pkls).
+
+
+11/3
+Am running the full_bo for the final users, still need to run 5x train_on_design for each
+
+I want to redo dan and amit's bo and full_bo since I changed the design space since I ran theirs
+
+So I will run those four overnight as well as 5x train_on_design for nikhil, anna, jihyun
+
+
+11/9
+Designing collaborations
+
+1) Have user select features 
+    this is the one I've been trying
+2) take the latest car and optimize over chosen features (instead of the baseline)
+    this is the same as the one I've been trying but need to swap the car design that we pull from initial design to final design (easy)
+    for safety, maybe do this as a separate script where we pull from the db
+3) ask for confidence (which features are you sure about) and fix those features, optimize the rest
+    need to run extra pilots for this
+
+4) initialize full BO with latest car
+    this is also easy to do, run full BO but pull a different design (from db instead)
+
+Plan of action:
+1) Schedule additional pilots through undergrads (ask Amit for help with changes or do them yourself, pretty much just need to change the question for the checkboxes, so actually just do them yourself)
+2) code up 2 (run_bo_on_redesign.py) and 3
+3) start running
+4) write a plotter to look at the BO samples/improvement to look for trends there
+    a) load a results.pkl
+    b) plot y over time
+    c) make the dots the designs
+
+I also want to try EI instead of LCB because it's a little more standard and I don't have a good reason for choosing LCB per se
+
+11/10
+Run extra 4 for each of the designs from yesterday (2 above)
+Note that two of them didn't work (dan and yuhan)--I think there were negative widths in the hulls, I'm going to skip these for now, although should be easy to fix, I want to confirm that it doesn't affect performance
+
+Run full BO with the six that worked from initial car (4 above)
+This should just be running bo_desinger_full with a different path and pulling the new design from the
+run_bo_full_on_redesign.py
+
+11/13
+Today I'm going to revamp the experiment scripts
+
+The primary goal here is to use the db to clean up the manual pathing
+
+I'd like to just say "run user X or session X for Y task" and then not have to look up the paths
+
+One idea I'd also like is to do it in a separate collection so that I'm not in danger of messing up the live db
+Also may need to track job completion, failure, etc.
+
+
+Current scripts:
+
+run_bo_designer:
+    If there is not a session_override_id specified, then it will check the sessions collection for any "pending" sessions.
+    Take the first pending session it finds, figure out what features to optimize over, run the BO for n steps, and train for 250.
+    If there is a session_override, we'll do it with that one instead.
+    If there is already a BO design for that session, it will 
+
+run_bo_designer_full
+    This really doesn't need to be tied to a session, as long as we track where we put them.
+    Essentially, this just runs the BO designer on all the features, then retrains.
+
+run_bo_on_redesign
+    This is the same as run_bo_designer, but it starts the BO with the user's final_design instead of inital_design (The default car).
+run_bo_on_redesign_full
+    This is the same as run_bo_designer_full, but it starts the BO with the user's final_design instead of inital_design (The default car).
+train_on_design
+    This takes a design (json) file, and an intial agent, and reruns the 250 step training, storing the results alongside the current results
+run_training
+    This just runs DQN for N episodes
+
+How can I clean this up? 
+
+It would be nice to say, run or rerun pilots {1,3,4} or pilot 2 or pilots 3:6 
+
+ok, so maybe the thing to do is clean up the live db
+so it only has the real sessions
+
+or maybe we can add like a pilot id or something
+
+orrr we have a table/doc that maps sessions to pilots
+
+This is really by user id I suppose
+
+
+Ok, so we have a list of pilot objects, each with the user id and associated session ids in order of timestamp
+
+Really what we need is to store sessions/experiments sessions for all the experiments we run associated with each human session
+
+
+Alright, this is taking shape. So we'll make a separate collection for offline experiments
+
+Should this be keyed by user_id? or by session_id?
+
+Or a better way of putting this, should I add a new object to the collection for each experiment I run? Or should I just update a single object for each pilot?
+
+Let's think about what info we want in each experiment:
+
+ok, the problem is there are different types of experiments. Mostly, there are experiments when I run the BO, and experiments where I just retrain.
+I definitely want to be able to query all the retrains with a single design.
+--maybe we should add the retrains to the same experiment, since they're not really new experiments, just reruns of the same experiment
+
+Experiment {
+    time_created: 
+    last_modified: 
+    experiment_id: a unique id for this experiment
+    user_id:
+    session_id:
+    experiment_type: hybrid_bo_diff
+    initial_design: this could be the baseline design, or for the on_redesign experiments, it could be a user design
+    final_design: this could be the same as the starting design, if no baseopt was run, otherwise it is the bo's design
+    bo_designs: []
+    started_bo: When BO optimization begins
+    finish_bo: When BO ends
+    bo_rewards: []
+    ran_bo: true or false (this is not really necessary, but makes the db more readable)
+    trial_paths: [
+        path1,
+        path2,
+    ]
+    trial_rewards: [
+        np_array_reward1,
+        np_array_reward2,
+    ]
+    finish_training: When DQN training ends (it is assumed to begin right after BO ends)
+    final_agent: the final agent filename after training on the best design
+}
+
+0) backup all scripts
+1) refactor run_training.py --> Matt, run_bo_designer.py, run_bo_designer_full.py --> Amit, run_bo_full_on_redesign.py --> Amit, run_bo_on_redesign.py-->Matt
+    a) use session "5f6d0b7b673446edf0d88f1d" as a test session (user "4248bf467c7b4a27afaaca841634a028")
+    b) define a key for each experiment type, "human", "bo_hybrid_select_features", "bo_hybrid_redesign", "full_bo", "full_bo_redesign"
+    c) when you run the experiment script:
+        i) check to see if there exists an experiment in the db with a given session id and experiment type
+            - note that the session id will be defined at the top of the script or in a separate file<--a list of session ids
+            - if exists, then insert the new paths under trials
+        ii) else generate the Experiment object above with any relevant fields.
+            - to do this, you need to pull the session for sessions (although the script already does this) DO NOT MODIFY SESSIONS
+            - any paths you generate should be put in the trials object.
+2) Update extract_design_data to use the db instead of data_paths.py
+3) Stream updates when training instead of dumping at the end <--extra
+
+
+11/17
+
+Chopshop allows you to swap the left/right coords so you get negative widths. The BO cannot account for this (obviously I can't have a negative width). And absolute valuing it changes the order so I'd get another shape.
+
+Actually, maybe I should allow negative widths. It would increase the number of shapes; I'm not sure if this would be okay or not.
+
+So based on some testing, Box2d will "fix" shapes with negative widths (I believe the same as if I took an abs value). 
+
+So I could either let the BO do negative widths and let Box2d fix it (this unfortunately complicates the design space a bit), or I could just abs the negative widths.
+
+I think I am leaning towards the latter. But I'll run the others first.
+
+
+Ok, so Gonzalo's design is breaking a couple of things. I added a flag to take the absolute value of negative widths (fix_negative_widths)
+He also had a bumper width of 2, and I think that's reasonable, so I bumped the range mins for spoilers and bumpers down to 1.
+Finally, he has an illegal color code. I think he must have clicked on opacity which screwed up the color, so I went in and looked at his car videos.
+It was a kind of magenta, so I edited his car color from 750af0c6, which is not valid rgb hex, to AA00CC, which is pretty magenta
+
+
+11/18
+Today I started plotting the experiments I've been running. I was confused that some of the BO came up with the exact same car.
+It appears that it scripts the samples for the first 5 designs and then starts using the acquisition function.
+So I am trying out adding four slight perturbations of the initial design with test drives to the initial seed.
+Actually now that I think about it that might be an argument.
+
+Anyway, while that stuff is running, what other kinds of things might be interesting to plot/evaluate?
+
+* 10 test drives for each final agent/design
+** write a script that goes through each finished design, runs ten test drives with its final agent/design, and dumps the results in the db
+* BO results over samples (not necessarily monotonic obviously)
+* how many features do users select on average
+** maybe a histogram over selected features
+
+number of designs each user evaluated
+how long each user spent on avg
+how long bo took on avg (wall-time)
+and compare
+
+test drive performance for humans vs bayesopt
+
+
+11/24
+One thing to figure out: does fixing negative widths change the car (yes it does). so what should I do with that? throw them out.
+
+I think there are three of them.
+
+
+11/25
+Also, try re-running Gonzalo's with the color fixed, just in case that's throwing things off
+
+Otherwise, it may be worth looking closely at his design to see why it's so bad (although I have to throw it out based on 11/24 comment)
+
+do the 10-test drive thing for each design/agent pair. This would be a better metric tbh.
+
+
+11/28
+I figured out a couple of annoying things with the final_agent paths today;
+- when I start out, I'm copying the agent file for paranoia reasons--I'm not actually overwriting it, I'm dumping to the timestamped subdirectory.
+- More concerning was the possibility that I wasn't dumping the final model--if I wasn't passing a model/model_name into the dqnagent, it would have been dumping every n%50==0
+- And if that was the case, the final one would not have dumped (n=249)
+- However, I AM passing a model in (the default model, if no model name then it would create a new model)
+- Thus, I am dumping the model at the end of .train() (in the else statement)
+- This raised a concern that the original agent was dumped after 200 and not 250 ep. even weirder the ep # was 0 in the filename storing
+- However, with some digging I remembered what happened.
+- the joe_b_dqn_baseline.py script runs policy_step for consecutive 250-step episodes.
+---- every time you call .train(), it creates a timestamped directory and dumps the current model on n==0
+---- I realized that it wasn't dumping before so instead of taking ep 200 from the previous, so I took the n==0 dump from the 2nd iteration through 250
+---- The problem here is that the n==0 dump happens AFTER running an episode for n==0. So it's actually 251 episodes, NOT 250!!!!
+---- I don't think this is a major issue; every treatment starts from 251, not from 250 (or I guess 252 instead of 251).
+---- 250 was fairly arbitrary anyway.
+
+To summarize:
+- For the manually added pilot studies, the final agent should be in the timestamped directories. This is dumped at the end of .train() because I passed in a model to start with.
+- For the final four pilot studies, I ALSO dumped final_agent.h5 outside the timestamped directory.
+- I also copied the default/initial agent outside the timestamped directory but it wasn't modified.
+- I took the 0th dump of the ep 251-500 batch as the initial agent (default agent)
+- This dump was taken after the 251st episode, so the initial agent is actually trained for 251 episodes.
+
+I'm now going to run the initial and ending test drives for the first 8 pilot studies.
+
+

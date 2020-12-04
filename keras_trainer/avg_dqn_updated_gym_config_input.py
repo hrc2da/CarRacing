@@ -235,14 +235,17 @@ class DQNAgent():
         self.model.fit(old_states, old_state_preds, batch_size=batch_size, epochs=1, verbose=0, workers=10, use_multiprocessing=True)
 
 
-
     def play_one(self, eps,train=True,video_path=None):
         if self.carConfig:
             # print("TRAINING WITH CAR CONFIG: ")
             # print(self.carConfig)
-            observation = self.env.reset(self.carConfig)
+            # sample a config around the carConfig
+            sampled_config = self.get_sampled_config(self.carConfig)
+            observation = self.env.reset(sampled_config, resample_config=True)
+
         else: 
             observation = self.env.reset()
+
         if video_path is not None:
             print("Setting video path to: {}".format(video_path))
             reset_video_recorder_filename(video_path,self.env)

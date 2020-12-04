@@ -287,7 +287,7 @@ class DQNAgent():
                 break
         return totalreward, iters
 
-    def train(self, retrain=False):
+    def train(self, retrain=False, eps_mode='dynamic'):
         self.timestamp = time.strftime("%m%d_%H%M")
         if retrain:
             self.timestamp += "_retrain"
@@ -299,10 +299,13 @@ class DQNAgent():
         totalrewards = np.empty(self.num_episodes)
         for n in range(self.num_episodes):
             print("training ", str(n))
-            if not self.model_name:
-                eps = 1/np.sqrt(n + 100)
-            else: # want to use a very small eps during retraining
-                eps = 0.01
+            if eps_mode == 'dynamic':
+                if not self.model_name:
+                    eps = 1/np.sqrt(n + 100)
+                else: # want to use a very small eps during retraining
+                    eps = 0.01
+            else:
+                eps = eps_mode
             totalreward, iters = self.play_one(eps)
             totalrewards[n] = totalreward
             print("episode:", n, "iters", iters, "total reward:", totalreward, "eps:", eps, "avg reward (last 100):", totalrewards[max(0, n-100):(n+1)].mean())        

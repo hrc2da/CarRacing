@@ -1,0 +1,27 @@
+For all: replay freq = 50
+
+Baseline(s)
+
+DQN-only, 1500 episodes, reset every 250
+B-DQN, 1500 episodes (250 warmup + 5*(100 design + 250 policy))
+B-DQN-Adapt, 1500 episodes (250 warmup + 5*(100 design + 250 policy)), adjust kappa per improvement
+
+
+Hybrid
+
+250 warmup, 5*(100 design (focused) + 250 policy) # consider starting from scratch on design step
+
+interface:
+* on load: check for session ID. if exists, POST to /session, else POST none to /session
+* receive: an initial car configuration, a set of videos, and a tfjs model. update state w/ car config and load the tfjs model.
+* on key input: drive the current car
+* on "test drive": use the loaded policy model to select an action from the state and drive the car
+* on "train/submit": POST the session ID and car config to the server for training, display thank you message.
+
+
+
+Human
+
+250 warmup, 5*250 policy on redesigned car
+
+

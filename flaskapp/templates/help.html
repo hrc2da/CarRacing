@@ -1,0 +1,77 @@
+<head>
+    <style>
+        body {
+            width: 70%;
+            margin: auto;
+            padding: 10px;
+        }
+        img {
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to ChopShop!</h1>
+    <p> The game where you design a car for an autonomus (AI) driver!</p>
+    <h2>Introduction</h2>
+    <p>
+        In this study, your goal is to design a car for an AI driver that is learning how to drive.
+
+        We'll ask you to watch videos of an AI driving a 2D car, analyze what the driver is doing well
+        or struggling with, then redesign the car to improve it's performance or help it to learn faster.
+
+        This study will consist of several rounds. Since it takes the driver a long time to train on
+        a new design, we will ask you to submit your design when you're happy and come back later for the next round.
+    </p>
+
+    <h2>Designing with ChopShop</h2>
+    <h3>The Info Screen</h3>
+    <figure>
+        <img src="static/img/intro_screen.png"/>
+        <figcaption>The ChopShop Info Screen</figcaption>
+    </figure>
+    
+    <p>
+        When you first open ChopShop, you'll see the Info Screen.
+    On the Info Screen, you will see ten videos of the driver driving with the initial design for this round.
+    If you've completed more than one round, you'll also see some statistics about your driver's progress since the last round.
+    Based on these observations, please fill out the four questions below the videos.
+    Finally, you can access help information here.
+
+    You can close the info screen by clicking "Continue" or anywhere outside the screen. You can always get back to it by clicking "Open Info Screen" on the top left of the interface.
+    </p>
+    
+    <h3>Main Interface: The Design Workspace</h3>
+    <p>
+        The main interface consists of three parts. The left side of the screen is where you can redesign the body of your car. You can do this by dragging horizontally on any of the vertices (highlighted in white or yellow) on the car body.
+    </p>
+    <p>
+        The right-hand side of the workspace contains a set of sliders on top, which you can use to tune different features in your car, like the engine horsepower or the tire tread. Below that is a panel to watch test drives with your design.
+    </p>
+    <p>
+        In order to test drive your car, hit the blue "Test Drive This Car" button on the left side above the car body panel. You should see a spinning loading icon over the test drive panel. Test drives can take several minutes to complete, so please be patient.
+    </p>
+    <p>
+        When you're happy with your design, hit the pink "I'm Finished, Submit my Design!" button. This will prompt you to answer a couple questions describing your design, then you can hit finalize design to submit.
+    </p>
+    
+    <h3>Car Design Features</h3>
+    <h4>Wheel Radius</h4>
+    <p>This controls how large your wheels are. The larger your wheels, the faster you can travel in a single rotation, but larger wheels are heavier, and can affect control.</p>
+    <h4>Wheel Width</h4>
+    <p>This affects how wide your wheels are. Again, larger wheels are heavier, but wider wheels can affect the traction of the car.</p>
+    <h4>Tire Tread</h4>
+    <p>This controls how tightly your tires are able to grip the road. A higher number implies better traction.</p>
+    <h4>Horsepower</h4>
+    <p>This controls how powerful your engine is, affecting the acceleration of your car. Larger horsepower engines accelerate faster and are also heavier.</p>
+    <h4>Brake Sensitivity</h4>
+    <p>This affects how sensitive the brakes are. A number less than one reduces the sensitivity of the brakes, a number greater than one increases it.</p>
+    <h4>Steering Sensitivity</h4>
+    <p>This affects how much the car's front wheels turn with the steering wheel. A lower number turns more slowly than a higher number.</p>
+    <h4>Rear Steering Sensitivity</h4>
+    <p>This affects how much the back wheels are able to turn (like on a fire truck). By default, it is set to 0, or disabled.</p>
+    <h4>Top Speed Limiter</h4>
+    <p>This tries to control the top speed of the car. Note that it is not always able to given the car's momentum. But it will try to prevent the car from going over the miles per hour that you set it at.</p>
+    <h4>Color</h4>
+    <p>This sets the paint color for your car.</p>
+</body>

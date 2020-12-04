@@ -1,0 +1,69 @@
+<head>
+    <style>
+        div.tooltip {	
+            position: absolute;			
+            text-align: center;			
+            width: 650px;					
+            height: 450px;					
+            padding: 2px;
+            margin-left: 20px;				
+            font: 12px sans-serif;		
+            background: rgba(159, 200, 253, 0.999);
+            border: 0px;		
+            border-radius: 8px;			
+            pointer-events: none;			
+        }
+        .carsvg {
+            position: absolute;			
+            text-align: center;	
+            width: 50px;
+            height: 50px;
+        }
+        .carsvglarge {
+            width: 150px;
+            height: 150px;
+            float:right;
+            /* background-color:white; */
+        }
+        .multiplot {
+            width: 400px;
+            height:200px;
+            padding: 2px;
+            background-color: white;
+            
+        }
+        table {
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!--Run python3 -m http.server to serve-->
+    <div id="scatter"></div>
+    
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/6.2.0/d3.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js'></script>
+    <script src='util.js'></script>
+    <script src='carUtils.js'></script>
+    <script src='stats.js'></script>
+    <script type="text/javascript">
+        let ymeasure = maxSpeed;
+        let legend_x_margin = 800;
+        let legend_y_margin = 20;
+    </script>
+    <script src='renderers.js'></script>
+    <script src='cars.js'></script>
+
+    <a href="./index.html">STD Reward</a>
+    <a href="./hp.html">Horsepower</a>
+    <a href="./tires.html">Tire Tread</a>
+    <a href="./speed.html">Max Speed</a>
+    <a href="./cost.html">Car Cost</a>
+</body>
+
