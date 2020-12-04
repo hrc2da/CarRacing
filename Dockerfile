@@ -6,7 +6,7 @@ COPY . /carracing
 RUN apt update
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y install tzdata
-RUN apt install swig xvfb libcairo2-dev pkg-config python3-dev python3-pycurl libgirepository1.0-dev python3-tk -y
+RUN apt install swig xvfb libcairo2-dev pkg-config python3-dev python3-pycurl libgirepository1.0-dev python3-tk ffmpeg python-opengl -y
 RUN pip install six
 RUN cd /carracing && pip install -r requirements.txt
 RUN cd /carracing/gym_latest && pip install -e .
