@@ -1,5 +1,10 @@
-version: '3'
+version: "2"
 services:
-  web:
-    build: .
-    ports: ["5000:5000"]
+        chopshop:
+                build: ./chopshop
+                ports:
+                        - "4242:4242"
+        carracing:
+                build: ./carracing
+                ports:
+                        - "5000:5000"
