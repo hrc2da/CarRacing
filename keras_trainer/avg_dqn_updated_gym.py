@@ -240,7 +240,7 @@ class DQNAgent():
         if self.carConfig:
             # print("TRAINING WITH CAR CONFIG: ")
             # print(self.carConfig)
-            observation = self.env.reset(self.carConfig)
+            observation = self.env.reset(config=self.carConfig)
         else: 
             observation = self.env.reset()
         if video_path is not None:

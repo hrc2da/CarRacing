@@ -23,7 +23,7 @@ RUN cd gym_latest && pip3 install -e .
 RUN cd .. && mkdir -p train_logs
 EXPOSE 5000
 RUN ls gym_latest/gym/envs/box2d
-CMD ["python3", "flaskapp/app.py"]
-
+# CMD ["xvfb-run","-a","-s \"screen 1400x900x24\"","python3", "flaskapp/app.py"]
+CMD ["/bin/bash"]
 # MKDR monitor-folder
 
