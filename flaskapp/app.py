@@ -9,6 +9,7 @@ import uuid
 # sys.path.append('/share/sandbox/')
 sys.path.append('/home/zhilong/Documents/HRC/CarRacing')
 sys.path.append('/home/dev/scratch/cars/carracing_clean')
+sys.path.append('/home/ubuntu/chopshop/carracing')
 #from carracing.agents.nsgaii import nsgaii_agent
 # from agents.nsgaii import nsgaii_agent
 #from carracing.keras_trainer.run_car import run_unparsed
@@ -23,10 +24,11 @@ import json
 from pyvirtualdisplay import Display
 import uuid
 import glob
+from config import Config
 app = Flask(__name__, static_url_path='/static')
-app.config.from_object('config.Config')
+app.config.from_object(Config)
+print(app.config)
 mongo = PyMongo(app)
-
 CORS(app) #not secure; set up a whitelist?
 socketio = SocketIO(app)
 # app.config["MONGO_URI"] = "mongodb://localhost:27017/carRacingTest"
@@ -66,6 +68,7 @@ def session():
         default_file_path = os.path.join(app.config['FILE_PATH'], app.config['DEFAULT_PATH'])
 
         videos = [s.replace(f'{app.config["FILE_PATH"]}/','') for s in glob.glob(f'{str(default_file_path)}/*.mp4')]
+        print(f'GLOB: {str(default_file_path)}/*.h5')
         agent = glob.glob(f'{str(default_file_path)}/*.h5')[0]
         configs = glob.glob(f'{str(default_file_path)}/*config.json')
         reward_plot_path = f'{app.config["DEFAULT_PATH"]}/reward_plot.png'
