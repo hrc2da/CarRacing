@@ -7,15 +7,15 @@ services:
                 build: ./chopshop
                 ports:
                         - "4242:4242"
-                          # carracing:
-                          # build: ./carracing
-                          # ports:
-                          # - "5000:5000"
-                          # volumes: 
-                          # - flask_data:/home/dev/scratch/cars/carracing_clean/flaskapp/static
+        carracing:
+                build: ./carracing
+                ports:
+                        - "5000:5000"
+                volumes: 
+                        - flask_data:/home/dev/scratch/cars/carracing_clean/flaskapp/static
         mongo:
                 image: mongo:latest
                 ports:
-                        - 27017:27017
+                        - "27017:27017"
                 volumes:
                         - mongo_data:/data/db
