@@ -547,6 +547,7 @@ class DACarRacing(gym.Env, EzPickle):
             len(polygons) // 3, ("v3f", polygons), ("c4f", colors)  # gl.GL_QUADS,
         )
         vl.draw(gl.GL_QUADS)
+        vl.delete()
         self.score_label.text = "%04i" % self.reward
         self.score_label.draw()
         

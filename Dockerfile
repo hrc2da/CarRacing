@@ -1,6 +1,6 @@
 # we are building off the latest tf image with gpu
 # and jupyter support baked in.
-FROM tensorflow/tensorflow:latest-gpu-jupyter
+FROM tensorflow/tensorflow:latest
 RUN mkdir -p /home/dev/scratch/cars/carracing_clean
 WORKDIR /home/dev/scratch/cars/carracing_clean
 COPY ./flaskapp flaskapp
@@ -12,7 +12,7 @@ RUN apt install -y git
 RUN git clone https://github.com/openai/gym gym_latest
 COPY ./cp_to_gym_envs/ gym_latest/gym/envs/
 # This is to fix a bug in gym video recording. If it has been fixed, you can remove.
-RUN sed -i '303s/\ \ \ \ \ \ \ \ /\ \ \ \ /' gym_latest/gym/wrappers/monitoring/video_recorder.py
+# Fixed -- RUN sed -i '303s/\ \ \ \ \ \ \ \ /\ \ \ \ /' gym_latest/gym/wrappers/monitoring/video_recorder.py
 RUN mkdir -p flaskapp/static
 COPY ./cp_to_flaskapp_static flaskapp/static 
 ENV DEBIAN_FRONTEND=noninteractive
