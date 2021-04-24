@@ -1,0 +1,26 @@
+* The car is bulged at the middle and extra wide on the top, with a smaller than normal wheel radius and wheel width. The tires have a lot of tread and the brakes are quite sensitive, with normal steering sensitivity and the lowest horsepower possible.
+
+* Slight modifications: reduced wheel size, increased the wheel width, increased the tire tread, increased the brake sensitivity, increased the steering sensitivity, increased the amount the rear wheels turn
+Major modifications: Severely reduced the top speed, shaped the car like a wine glass
+
+* Higher wheel width, tire thread, steering sensitivity and break sensitivity. Lower engine horsepower.
+
+* So honestly, i had some trouble making the decisions to improve the car, because i cannot get a bird's eye view of how the car is doing. by getting a close up view, I had a lot of trouble determining what it was doing, and so i didnt know what i should do to fix its course
+
+* The design is lightweight, low-power energy efficient car. The green color represents that it is environmental friendly, and blends perfectly with the grass. It use small engine horsepower, and small flexible wheels, also works better with new drivers.~
+
+* It's a heavier design with less horsepower
+
+* I made a smaller-bodied car with a smaller wheel radius for more nimble driving. I went with a very low steering sensitivity because the AI driver seemed to consistently over-correct, which often resulted in the car spinning in circles in the grass. I kept the engine power low because the driver seemed not ready to handle more power.  
+
+* I increased the tire tread to 51 and drastically its speed threshold to 50 mph. I also reduced the engine size to the 30 to reduce its acceleration. I also changed the color just for fun. Additionally increased the steering sensitivity to .56
+
+* I kept the car visually the same, but I decreased the max speed and acceleration while increasing the wheel width and turning power.
+
+* The car has low turning ability by having a lower wheel radius and width, a very high tire tread, and very low steering sensitivity. The max speed is also very low.
+
+* - More emphasis on tuning steering sensitivity and wheel traction (through tire tread)
+- Changed the shape of the car to be wider
+
+* decreased wheel width, increased speed limit, increased sensitivity for brakes, steering wheel, and rear.
+

@@ -1,0 +1,24 @@
+* Modifying the horsepower, steering sensitivity, and the brake sensitivity will help with turns, and from there I can adjust the actual car shape for further optimization.
+
+* I think making the car easier to turn would help. Also, maybe if it was made slower, the driver would be able to complete the turns
+
+* Add steering capability
+
+* give it capability to sense the lane.
+
+* Maybe help the car slow down a bit, so the driver will have more opportunity to practice its turning before getting out of the track. 
+
+* umm... make the steering less sensitive
+
+* I wonder if they are braking but the brakes aren't sensitive enough? Or the tires might need a different tread. 
+
+* Im thinking perhaps make the car a lot slower, so that the driver has more time to recognize when it needs to turn.
+
+* I could potentially make the wheels unbalanced in a way that favors leftward motion. Alternatively, I could slow down the car so that the driver can control more of the motion.
+
+* Make the car turn the right direction.
+
+* - How sensitive the wheels are to turning
+
+* signal when going off track; slowing down when making turns.
+

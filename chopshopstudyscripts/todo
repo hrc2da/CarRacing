@@ -1,0 +1,10 @@
+move updated anna study to carRacingTest2
+rerun h1human for the finished data
+
+generate a fixed set of maps and/or figure out if seeding will generate identical maps using diff
+refactor gym_latest to save/load maps as needed
+
+rerun h1human, h1control using a fixed set of ~20 maps
+
+Plot stuff and try to dig into a couple of case studies "best" and "worst"?
+

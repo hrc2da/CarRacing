@@ -1,0 +1,26 @@
+* The AI seems to constantly adjust its position with a 'left' or 'right' turn at every timestep, along with some nonzero acceleration.
+
+* The driver seems to make very little effort to stay on the track. They turn very slightly in the wrong direction at the first turn.
+
+* It just goes in a straight line, except for one trial where it went off track and kept spinning.
+
+* It does not seem to follow the track at all.
+
+* He keeps accelerating. He never brakes. He most time does not turn. 
+
+* lol it's bad, it doesn't really know to steer
+
+* The driver appears to be "driving" but with very little control. 
+
+* The driver right now doesnt know much about how to make it around the track. It seems to basically hit the gas once or twice and hope for the best. 
+
+* The driver always chooses to move forward and turn slightly right (except in one video where the driver veered hard right).
+
+* The driver goes the opposite direction when it's supposed to turn.
+
+* - Drives very straight until there is a bend in the track
+- Bend in track is always a left turn, and the driver always turns right (sometimes at varying angles)
+- After driving off the track, either keeps driving straight until the edge of the world is hit or would make weird circles
+
+* turning left when it's supposed to turn left.
+

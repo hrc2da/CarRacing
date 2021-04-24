@@ -1,0 +1,4 @@
+* due to a bug in chopshop, some cars have negative widths (I can fix this, but I'm not sure if it fits what the user saw)
+* due to a bug in chopshop, one car had an impossible color (user adjusted opacity, how did it not crash lol)
+* the test drive videos don't seem right (they are all way too similar, maybe I messed up the seeding or something? I honestly don't know how I would figure out why the videos we got were so similar)
+* some users only submitted 1 or 2 designs (this may have been due to a misunderstanding in the instructions)

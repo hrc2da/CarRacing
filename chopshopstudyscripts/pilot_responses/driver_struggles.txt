@@ -1,0 +1,25 @@
+* Any sort of steep turn either makes the driver skid off the track or makes the driver turn the wrong direction entirely.
+
+* The driver seems to be struggling with turning enough
+
+* Turning the car
+
+* maybe it is struggling with identifying the turns
+
+* Turning. He sort of knows when to turn but doesn't know the direction and angle. 
+
+* steering - it either seems to steer too much, running in circles, or not at all, running a straight line
+
+* Driving basics appear to be the biggest area of need. I saw very few attempts to control the car, including limited steering and little to no braking. 
+
+* It doesnt understand how to turn or perhaps doesnt know how to recognize when to turn. It also doesnt know how to get back onto the road once it veers off. 
+
+* The driver is not turning left when the track goes toward the left.
+
+* Figuring out which direction to turn.
+
+* - Adjusting to turns in the track
+- Rerouting to get back onto the track after driving off
+
+* realizing when to turn left; always turning right.
+

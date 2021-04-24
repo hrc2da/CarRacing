@@ -1,0 +1,26 @@
+* The high brake sensitivity, high tire tread, and low horsepower were all picked in an attempt to stop the car from "overshooting" all the turns and veering straight off the path. These design choices made the car much slower but makes it stay on the track for longer time periods, which is good. The rest of the design choices (bulging middle, wide front, and low tire radius) were picked by trial and error to help the car turn with generally more precision; sometimes the driver steers the car in the opposite direction of the track, and  these choices reduced the frequency of this type of steering occuring.
+
+* The driver seemed to initially have a lot of trouble with turns so I tried to improve the handling of the car. Reducing the top speed seemed to be the most effective metric in allowing the driver to make the turns. Also, the wine-glass shape looks classy
+
+* I increased wheel width and the tire thread to increase traction. I reduced the engine horsepower to slow down the car (we don't want learners overspeeding). I increased the steering and break sensitivity to improve turning performance of the car.
+
+* i chose breaking so that it helps with smooth turning and does not skid, i tried to do the same thing by improving tire traction, improving steering sensitivity helped at turns but it was still snipping way too much. i wanted to use rear steering  but didnt know what to do. Its cool game BTW.. had fun designing the car.
+
+* I chose low steering sensitivity and low rear steering power because I found the driver likes to turn sharply when he's slightly off the track, thus making it worse. Thus I restrict how much he can turn mechanically. I also chose a small engine horsepower and limit the top speed to less than a half. Because I found the driver is still raw, he needs slower speed to give him more tolerance so that he can practice his tactics, like rotation etc. I chose high brake sensitivity for a similar reason, I just want the driver to slow it down more quickly when anything goes wrong.
+
+* I wanted it to drive more slowly and the be less sensitive to steering by increasing mass
+
+* I tried to support the novice driver with a lower-powered, easier to control vehicle. It was hard to determine which features to adjust and the impact of those features (especially when the same design would get vastly different test drive scores depending on the test run. My last test drive was the best of the bunch, so I submitted before I ruined it! 
+
+* I didnt change anything about the car shape at this stage. Since the driver is a beginner, I figured something like is much less important for seeing dramatic improvement. Instead I focussed on making the car a lot easier to handle with the assumption that currently the driver also doesnt have very good reaction time. I initially dramatically reduced the top speed of the car to 30 mph with the expectation that the driver simply needs more time to process when it needs to turn. I also tried to simultaneously improve handling by increasing the tire tread. This way the car wouldn't slide all over the place as a result of a slight push on the pedal. I also reduced the engine size so that a slight push on the pedal would not cause the car to accelerate very quickly. These changes proved to be very fruitful as I saw a top score of about 450. The driver was typically very easily able to make turns and stay on the road. However, the driver wasnt going very fast. 
+
+Next, I decided to up the top speed to 60 mph. This made the driver's performance much worse as even though it knew about turning, it couldnt turn fast enough for the speed at which it was going. Since I did want to get the car to move fast I decided to just drop the top speed a little to 55 mph but increase the steering sensitivity to 0.55 to account for the fact that the car is moving much faster. This resulted in my best performance of about 770.
+
+* Whenever the car had a high acceleration or speed, the AI was unable to control the car and veered uncontrollably. To resolve this, I allowed the AI to have more control over steering, increased the wheel width to provide more traction on turns, and decreased the horsepower and top speed to make sure the driver had control.
+
+* The driver wouldn't stop driving in a zig-zag motion so I tried to inhibit it's ability to turn as much as possible so that the zig-zag oscillations would steady out quickly and allow the driver to drive straight.
+
+* In prior test drives, I saw that the test car made a lot of really wide turns, so I wanted to minimize this. In addition, I wanted to make sure that there was still a good amount of speed during the drive, so I adjusted the top speed limiter variable throughout each test drive/iteration.
+
+* decreased wheel width for more traction & better handling of turns. Increased brake sensitivity and rare steering power to change how the car turns. 
+
