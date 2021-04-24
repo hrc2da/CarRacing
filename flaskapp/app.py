@@ -24,7 +24,7 @@ import json
 from pyvirtualdisplay import Display
 import uuid
 import glob
-from config import Config
+from .config import Config
 app = Flask(__name__, static_url_path='/static')
 app.config.from_object(Config)
 print(app.config)
@@ -199,7 +199,6 @@ def testdrive(train=False):
     
     num_episodes -= 1 # train for n-1 and then call play_once to get the video
     driver = DQNAgent(num_episodes, trained_model_name, car_config, replay_freq=50, freeze_hidden=False)
-    
     # if num_episodes > 0:
     #     training = True       
     #     driver.train()
@@ -213,6 +212,7 @@ def testdrive(train=False):
     training = False
     result = driver.play_one(train=training,video_path=video_path,eps=0.01)
     driver.memory.save(os.path.join(os.getcwd(),"dumped_memory.pkl"))
+    driver.env.env.close()
     driver.env.close()
     session = mongo.db.sessions.find_one_and_update({"_id":session["_id"]},
                                                     {"$set":{"last_modified":datetime.datetime.utcnow()},"$push":{"tested_designs":car_config,
