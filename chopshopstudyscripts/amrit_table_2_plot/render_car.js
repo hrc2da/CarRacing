@@ -130,7 +130,7 @@ const renderCar = (carConfig) => {
       }
 
     //   SVGResult = "<svg><line x1=10 y1=10 x2=50 y2=50 strokeWidth=5 stroke='black'/></svg>"
-    SVGResult = `<svg viewbox="0 0 600 600"><line x1=${wheelPairs[0][0][0]+carConfig.wheel_width/2} y1=${wheelPairs[0][0][1]} ` +
+    SVGResult = `<svg viewbox="0 0 600 600"><g transform ="rotate(-90)" transform-origin="center"><line x1=${wheelPairs[0][0][0]+carConfig.wheel_width/2} y1=${wheelPairs[0][0][1]} ` +
                     `x2=${wheelPairs[0][1][0]-carConfig.wheel_width/2} y2=${wheelPairs[0][1][1]} ` +
                     `strokeWidth=${5} stroke="${wheelColor}"/>` +
                 `<line x1=${wheelPairs[1][0][0]+carConfig.wheel_width/2} y1=${wheelPairs[1][0][1]} ` +
@@ -140,7 +140,7 @@ const renderCar = (carConfig) => {
                 `${coords2SVG(hull1,carConfig.color,carConfig.hull_densities[1],xOffset,yOffset,scale,className)}` + 
                 `${coords2SVG(hull2,carConfig.color,carConfig.hull_densities[2],xOffset,yOffset,scale,className)}` +
                 `${coords2SVG(spoiler,carConfig.color,carConfig.hull_densities[3],xOffset,yOffset,scale,className)}` +
-                `${wheel_coords.map(w=>coords2SVG(w,wheelColor,0.6+(0.25*carConfig.friction_lim/1e4),xOffset,yOffset))}</svg>`
+                `${wheel_coords.map(w=>coords2SVG(w,wheelColor,0.6+(0.25*carConfig.friction_lim/1e4),xOffset,yOffset))}</g></svg>`
     // console.log(SVGResult);
     return SVGResult;
 }

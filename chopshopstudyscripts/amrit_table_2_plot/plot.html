@@ -9,7 +9,7 @@
 
 <script>
     // set the dimensions and margins of the graph
-    var font_size = '12px'
+    var font_size = '13px'
     var margin = {top: 120, right: 0, bottom: 110, left: 100},
     width = 700 - margin.left - margin.right,
     height = 820 - margin.top - margin.bottom;
@@ -122,11 +122,10 @@ function plot_car_designs(json){
         let design_config = json[participant];
         let svg_render = renderCar(design_config);
         let car_group = cars_svg.append('g');
-        car_group.append('svg').html(svg_render)
-        .attr('transform','rotate(90)')
-        .attr('height', "50")
-        .attr("y", function(d) { return y(participant) + 120})
-        
+        let car_group_svg = car_group.append('svg').html(svg_render)
+        .attr('height', "70")
+        .attr('x', 4)
+        .attr("y", function(d) { return y(participant) + 105})
     }
 }
 cars_svg.append('text')
