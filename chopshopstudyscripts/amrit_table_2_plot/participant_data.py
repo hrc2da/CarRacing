@@ -20,7 +20,7 @@ all_features = set(["engine power", "tire tread", "wheel radius", "wheel width" 
 rows = []
 hist_rows = []
 for participant_num, participant_info in participant_data.items():
-    participant_num_fmt = f"p{participant_num}"
+    participant_num_fmt = f"P{participant_num}"
     features, num_designs = participant_info
     features_in_final_design = features
     hist_rows.append([participant_num_fmt, num_designs])

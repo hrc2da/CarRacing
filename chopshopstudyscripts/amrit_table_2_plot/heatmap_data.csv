@@ -1,121 +1,121 @@
 participant,feature,value
-p0,engine power,1
-p0,tire tread,1
-p0,wheel radius,1
-p0,body shape,1
-p0,steering sensitivity,1
-p0,brake sensitivity,1
-p0,wheel width,0
-p0,color,0
-p0,max speed,0
-p0,rear steering,0
-p1,engine power,1
-p1,tire tread,1
-p1,wheel radius,1
-p1,wheel width,1
-p1,body shape,1
-p1,steering sensitivity,1
-p1,rear steering,1
-p1,brake sensitivity,1
-p1,max speed,1
-p1,color,1
-p2,engine power,1
-p2,tire tread,1
-p2,wheel radius,1
-p2,wheel width,1
-p2,body shape,1
-p2,steering sensitivity,1
-p2,brake sensitivity,1
-p2,rear steering,0
-p2,color,0
-p2,max speed,0
-p3,engine power,1
-p3,wheel width,1
-p3,body shape,1
-p3,steering sensitivity,1
-p3,brake sensitivity,1
-p3,max speed,1
-p3,color,0
-p3,rear steering,0
-p3,wheel radius,0
-p3,tire tread,0
-p4,engine power,1
-p4,wheel radius,1
-p4,wheel width,1
-p4,body shape,1
-p4,steering sensitivity,1
-p4,rear steering,1
-p4,brake sensitivity,1
-p4,max speed,1
-p4,color,1
-p4,tire tread,0
-p5,engine power,1
-p5,body shape,1
-p5,wheel width,0
-p5,steering sensitivity,0
-p5,color,0
-p5,wheel radius,0
-p5,max speed,0
-p5,rear steering,0
-p5,tire tread,0
-p5,brake sensitivity,0
-p6,tire tread,1
-p6,wheel radius,1
-p6,body shape,1
-p6,steering sensitivity,1
-p6,brake sensitivity,1
-p6,color,1
-p6,wheel width,0
-p6,rear steering,0
-p6,max speed,0
-p6,engine power,0
-p7,engine power,1
-p7,tire tread,1
-p7,body shape,1
-p7,steering sensitivity,1
-p7,max speed,1
-p7,color,1
-p7,wheel width,0
-p7,wheel radius,0
-p7,brake sensitivity,0
-p7,rear steering,0
-p8,wheel width,1
-p8,steering sensitivity,1
-p8,max speed,1
-p8,color,1
-p8,body shape,0
-p8,wheel radius,0
-p8,engine power,0
-p8,rear steering,0
-p8,tire tread,0
-p8,brake sensitivity,0
-p9,engine power,1
-p9,tire tread,1
-p9,wheel width,1
-p9,body shape,1
-p9,steering sensitivity,1
-p9,rear steering,1
-p9,max speed,1
-p9,color,1
-p9,wheel radius,0
-p9,brake sensitivity,0
-p10,tire tread,1
-p10,wheel width,1
-p10,body shape,1
-p10,brake sensitivity,1
-p10,max speed,1
-p10,color,1
-p10,steering sensitivity,0
-p10,wheel radius,0
-p10,engine power,0
-p10,rear steering,0
-p11,tire tread,1
-p11,wheel radius,1
-p11,wheel width,1
-p11,body shape,1
-p11,steering sensitivity,1
-p11,rear steering,1
-p11,brake sensitivity,1
-p11,max speed,1
-p11,color,1
-p11,engine power,0
+P0,engine power,1
+P0,tire tread,1
+P0,wheel radius,1
+P0,body shape,1
+P0,steering sensitivity,1
+P0,brake sensitivity,1
+P0,color,0
+P0,max speed,0
+P0,rear steering,0
+P0,wheel width,0
+P1,engine power,1
+P1,tire tread,1
+P1,wheel radius,1
+P1,wheel width,1
+P1,body shape,1
+P1,steering sensitivity,1
+P1,rear steering,1
+P1,brake sensitivity,1
+P1,max speed,1
+P1,color,1
+P2,engine power,1
+P2,tire tread,1
+P2,wheel radius,1
+P2,wheel width,1
+P2,body shape,1
+P2,steering sensitivity,1
+P2,brake sensitivity,1
+P2,max speed,0
+P2,rear steering,0
+P2,color,0
+P3,engine power,1
+P3,wheel width,1
+P3,body shape,1
+P3,steering sensitivity,1
+P3,brake sensitivity,1
+P3,max speed,1
+P3,wheel radius,0
+P3,tire tread,0
+P3,color,0
+P3,rear steering,0
+P4,engine power,1
+P4,wheel radius,1
+P4,wheel width,1
+P4,body shape,1
+P4,steering sensitivity,1
+P4,rear steering,1
+P4,brake sensitivity,1
+P4,max speed,1
+P4,color,1
+P4,tire tread,0
+P5,engine power,1
+P5,body shape,1
+P5,steering sensitivity,0
+P5,wheel width,0
+P5,brake sensitivity,0
+P5,tire tread,0
+P5,rear steering,0
+P5,max speed,0
+P5,color,0
+P5,wheel radius,0
+P6,tire tread,1
+P6,wheel radius,1
+P6,body shape,1
+P6,steering sensitivity,1
+P6,brake sensitivity,1
+P6,color,1
+P6,engine power,0
+P6,max speed,0
+P6,rear steering,0
+P6,wheel width,0
+P7,engine power,1
+P7,tire tread,1
+P7,body shape,1
+P7,steering sensitivity,1
+P7,max speed,1
+P7,color,1
+P7,brake sensitivity,0
+P7,wheel width,0
+P7,rear steering,0
+P7,wheel radius,0
+P8,wheel width,1
+P8,steering sensitivity,1
+P8,max speed,1
+P8,color,1
+P8,engine power,0
+P8,brake sensitivity,0
+P8,tire tread,0
+P8,rear steering,0
+P8,body shape,0
+P8,wheel radius,0
+P9,engine power,1
+P9,tire tread,1
+P9,wheel width,1
+P9,body shape,1
+P9,steering sensitivity,1
+P9,rear steering,1
+P9,max speed,1
+P9,color,1
+P9,brake sensitivity,0
+P9,wheel radius,0
+P10,tire tread,1
+P10,wheel width,1
+P10,body shape,1
+P10,brake sensitivity,1
+P10,max speed,1
+P10,color,1
+P10,engine power,0
+P10,wheel radius,0
+P10,steering sensitivity,0
+P10,rear steering,0
+P11,tire tread,1
+P11,wheel radius,1
+P11,wheel width,1
+P11,body shape,1
+P11,steering sensitivity,1
+P11,rear steering,1
+P11,brake sensitivity,1
+P11,max speed,1
+P11,color,1
+P11,engine power,0
