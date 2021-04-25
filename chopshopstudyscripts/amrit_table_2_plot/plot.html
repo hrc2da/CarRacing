@@ -112,8 +112,10 @@
 var margin_cars = {top: 120, right: 0, bottom: 110, left: 0},
 width_cars = 90 - margin_cars.left - margin_cars.right,
 height_cars = 820 - margin_cars.top - margin_cars.bottom;
-var cars_svg = d3.select('#viz').append('svg').attr("width", width_cars + margin_cars.left + margin_cars.right)
+var cars_svg = d3.select('#viz').append('svg')
+    .attr("width", width_cars + margin_cars.left + margin_cars.right)
     .attr("height", height_cars + margin_cars.top + margin_cars.bottom)
+
 
 function plot_car_designs(json){
     for(const participant in json){
@@ -121,8 +123,10 @@ function plot_car_designs(json){
         let svg_render = renderCar(design_config);
         let car_group = cars_svg.append('g');
         car_group.append('svg').html(svg_render)
+        .attr('transform','rotate(90)')
         .attr('height', "50")
-        .attr("y", function(d) { return y(participant) + 120});
+        .attr("y", function(d) { return y(participant) + 120})
+        
     }
 }
 cars_svg.append('text')
@@ -145,7 +149,7 @@ height_hist = 820 - margin_hist.top - margin_hist.bottom;
 
 // set the ranges
 var y_hist = d3.scaleBand()
-        .range([height_hist, 0])
+        .range([0, height_hist])
         .padding(0.1);
 
 var x_hist = d3.scaleLinear()
