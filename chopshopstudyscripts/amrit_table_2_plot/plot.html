@@ -3,15 +3,16 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
-
-<!-- Create a div where the graph will take place -->
+<script src="render_car.js"></script>
 <div id="viz"></div>
+<!-- Create a div where the graph will take place -->
 
 <script>
     // set the dimensions and margins of the graph
-    var margin = {top: 100, right: 0, bottom: 130, left: 100},
-    width = 500 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+    var font_size = '12px'
+    var margin = {top: 120, right: 0, bottom: 110, left: 100},
+    width = 700 - margin.left - margin.right,
+    height = 820 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
     var svg = d3.select("#viz")
@@ -34,6 +35,7 @@
     .selectAll("text")
     .attr("y", 0)
     .attr("x", 9)
+    .attr("font-size", font_size)
     .attr("dy", ".35em")
     .attr("transform", "rotate(-80)")
     .style("text-anchor", "start");
@@ -43,7 +45,9 @@
     .range([ 0, height ])
     .domain(parts)
     svg.append("g")
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y))
+    .selectAll('text')
+    .attr("font-size", font_size);
 
     let box_height = y.bandwidth()
     let box_width = x.bandwidth()
@@ -58,14 +62,14 @@
 
     svg.append('text')
     .attr('x', 0+ box_width/2 + 5)
-    .attr('y', height + box_height / 2 + 14)
+    .attr('y', height + box_height / 2 + 10)
     .text('Feature modified in Final Design')
     .attr("font-family" , "Arial")
-    .attr("font-size" , "10px")
+    .attr("font-size" , font_size)
     .attr("text-anchor", "start");
 
     svg.append('rect')
-    .attr('x', 200)
+    .attr('x', 300)
     .attr('y', height + 18)
     .attr('width', box_width / 2)
     .attr('height', box_height / 2)
@@ -73,11 +77,11 @@
     .style('stroke', "#378c79" )
 
     svg.append('text')
-    .attr('x', 200 + box_width/2 + 5)
-    .attr('y', height + box_height / 2 + 14)
+    .attr('x', 300 + box_width/2 + 5)
+    .attr('y', height + box_height / 2 + 10)
     .text('Feature not modified in Final Design')
     .attr("font-family" , "Arial")
-    .attr("font-size" , "10px")
+    .attr("font-size" , font_size)
     .attr("text-anchor", "start");
 
     // Build color scale
@@ -104,10 +108,40 @@
 </script>
 
 <script>
+    // set the dimensions and margins of the graph
+var margin_cars = {top: 120, right: 0, bottom: 110, left: 0},
+width_cars = 90 - margin_cars.left - margin_cars.right,
+height_cars = 820 - margin_cars.top - margin_cars.bottom;
+var cars_svg = d3.select('#viz').append('svg').attr("width", width_cars + margin_cars.left + margin_cars.right)
+    .attr("height", height_cars + margin_cars.top + margin_cars.bottom)
+
+function plot_car_designs(json){
+    for(const participant in json){
+        let design_config = json[participant];
+        let svg_render = renderCar(design_config);
+        let car_group = cars_svg.append('g');
+        car_group.append('svg').html(svg_render)
+        .attr('height', "50")
+        .attr("y", function(d) { return y(participant) + 120});
+    }
+}
+cars_svg.append('text')
+    .text('Final Design')
+    .attr('transform', 'translate(' + width_cars / 2 + ',' + 115+ ')')
+    .style("text-anchor", "middle")
+    .style('font-family', 'sans-serif')
+    .style('font-size', font_size);
+
+fetch("final_designs.json")
+  .then(response => response.json())
+  .then(json => plot_car_designs(json));
+</script>
+
+<script>
 // set the dimensions and margins of the graph
-var margin_hist = {top: 100, right: 20, bottom: 130, left: 10},
-width_hist = 250 - margin_hist.left - margin_hist.right,
-height_hist = 600 - margin_hist.top - margin_hist.bottom;
+var margin_hist = {top: 120, right: 20, bottom: 110, left: 0},
+width_hist = 350 - margin_hist.left - margin_hist.right,
+height_hist = 820 - margin_hist.top - margin_hist.bottom;
 
 // set the ranges
 var y_hist = d3.scaleBand()
@@ -161,7 +195,7 @@ d3.csv("hist_data.csv", function(data){
         return x_hist(Number(d.value)) + 3;
     })
     .attr("font-family" , "Arial")
-    .attr("font-size" , "10px")
+    .attr("font-size" , font_size)
     .attr("fill" , "black")
     .attr("text-anchor", "start");
 
@@ -177,7 +211,7 @@ d3.csv("hist_data.csv", function(data){
                             (height_hist + 30) + ")")
         .style("text-anchor", "middle")
         .style('font-family', 'sans-serif')
-        .style('font-size', '10px')
+        .style('font-size', font_size)
         .text("Number of Designs Tested");
 })
 

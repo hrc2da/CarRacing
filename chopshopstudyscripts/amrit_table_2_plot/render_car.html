@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="render_car.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="viz"></div>
+
+<script>
+
+function plot_car_designs(json){
+    for(const participant in json){
+        let design_config = json[participant];
+        let svg_render = renderCar(design_config);
+        d3.select('#viz').append('svg').html(svg_render).attr('height', "40");
+    }
+}
+
+fetch("final_designs.json")
+  .then(response => response.json())
+  .then(json => plot_car_designs(json));
+</script>
